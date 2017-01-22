@@ -56,7 +56,7 @@ public class HistoryAdapter extends CursorRecyclerViewAdapter<HistoryAdapter.Vie
         ExpenseItem item = ExpenseItem.fromCursor(cursor);
         String note = item.getNote();
         viewHolder.categoryTxt.setText(note.isEmpty() ? item.getCategory().getName() : note);
-        viewHolder.amountTxt.setText("$" + Utils.doubleTwoDecimalPlaces(item.getAmount()));
+        viewHolder.amountTxt.setText("$" + Utils.formatDoubleTwoDecimalPlaces(item.getAmount()));
         //SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.CANADA);
         viewHolder.dateTxt.setText(DateUtils.formatDateTime(
                 mContext,

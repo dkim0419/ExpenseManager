@@ -26,7 +26,7 @@ import com.danielkim.expensemanager.Utils.CustomAnimation;
 import com.danielkim.expensemanager.Databases.DBContentProvider;
 import com.danielkim.expensemanager.Databases.DBHelper;
 import com.danielkim.expensemanager.R;
-import com.danielkim.expensemanager.Utils.Utilities;
+import com.danielkim.expensemanager.Utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -133,7 +133,7 @@ public class AddExpenseActivity extends AppCompatActivity
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (!hasFocus){
-                    Utilities.hideKeyboard((Activity)getApplicationContext());
+                    Utils.hideKeyboard((Activity)getApplicationContext());
                 }
             }
         });
@@ -201,7 +201,7 @@ public class AddExpenseActivity extends AppCompatActivity
 
     // Open CalendarView to choose date
     private void chooseDate(){
-        Utilities.hideKeyboard(this);
+        Utils.hideKeyboard(this);
 
         DatePickerDialog datePicker = new DatePickerDialog(this, this, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
         datePicker.show();

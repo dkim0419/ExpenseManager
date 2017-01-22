@@ -67,7 +67,7 @@ public final class Utils {
     }
 
     private static DecimalFormat twoDecimalPlaceFormat = new DecimalFormat("0.00");
-    public static String doubleTwoDecimalPlaces(double d){
+    public static String formatDoubleTwoDecimalPlaces(double d){
         return twoDecimalPlaceFormat.format(d);
     }
 }

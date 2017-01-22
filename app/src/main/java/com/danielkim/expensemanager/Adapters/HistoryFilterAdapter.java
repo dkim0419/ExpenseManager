@@ -54,7 +54,7 @@ public class HistoryFilterAdapter extends CursorRecyclerViewAdapter<HistoryFilte
     public void onBindViewHolder(ViewHolder holder, Cursor c) {
         final String monthYear = c.getString(HistoryFilterFragment.PROJECTION_DATE);
         String monthYearFormatted = Utils.getFormattedMonthYear( c.getString(HistoryFilterFragment.PROJECTION_DATE));
-        String amount = Utils.doubleTwoDecimalPlaces(c.getDouble(HistoryFilterFragment.PROJECTION_SUM)); // amount
+        String amount = Utils.formatDoubleTwoDecimalPlaces(c.getDouble(HistoryFilterFragment.PROJECTION_SUM)); // amount
         int count = c.getInt(HistoryFilterFragment.PROJECTION_COUNT);
 
         holder.mAmount.setText("$" + amount);

@@ -23,7 +23,6 @@ import com.danielkim.expensemanager.Databases.DBHelper;
 import com.danielkim.expensemanager.R;
 import com.danielkim.expensemanager.Utils.Utils;
 
-import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -114,8 +113,7 @@ public class OverviewFragment extends Fragment implements LoaderManager.LoaderCa
                     sum += cursor.getDouble(cursor.getColumnIndex(DBHelper.ExpensesTable.COL_AMOUNT));
                 }
 
-                DecimalFormat df = new DecimalFormat("#.00");
-                txtCurrentMonthExpenses.setText(df.format(sum));
+                txtCurrentMonthExpenses.setText(Utils.formatDoubleTwoDecimalPlaces((sum)));
                 break;
             default:
                 return;
