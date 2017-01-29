@@ -29,7 +29,7 @@ import java.util.Date;
 /**
  * Created by Daniel on 2/17/2016.
  */
-public class OverviewFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class OverviewFragment extends Fragment implements NavDrawerFragment, LoaderManager.LoaderCallbacks<Cursor> {
     private TextView txtCurrentMonth = null;
     private FloatingActionButton fabAddExpense; // add new expense fab button
     private TextView txtCurrentMonthExpenses = null;
@@ -60,6 +60,11 @@ public class OverviewFragment extends Fragment implements LoaderManager.LoaderCa
         selectionArgs = new String[] {String.format("%02d", month) + " " + year};
     }
 
+    @Override
+    public int getNavDrawerId() {
+        return R.id.nav_overview;
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -72,12 +77,14 @@ public class OverviewFragment extends Fragment implements LoaderManager.LoaderCa
         txtCurrentMonth.setText(monthName);
 
         fabAddExpense = (FloatingActionButton)v.findViewById(R.id.fab);
-        if (fabAddExpense != null) fabAddExpense.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                addNewExpense();
-            }
-        });
+        if (fabAddExpense != null) {
+            fabAddExpense.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v) {
+                    addNewExpense();
+                }
+            });
+        }
 
         mCallbacks = this;
         getLoaderManager().initLoader(LOADER_ID, null, mCallbacks);

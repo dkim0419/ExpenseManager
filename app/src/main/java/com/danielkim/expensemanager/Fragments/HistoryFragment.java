@@ -23,7 +23,7 @@ import com.danielkim.expensemanager.Utils.Utils;
 /**
  * Created by Daniel on 4/21/2016.
  */
-public class HistoryFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class HistoryFragment extends Fragment implements NavDrawerFragment, LoaderManager.LoaderCallbacks<Cursor> {
     private RecyclerView mRecyclerView;
     private HistoryAdapter adapter;
 
@@ -56,6 +56,11 @@ public class HistoryFragment extends Fragment implements LoaderManager.LoaderCal
         args.putString(ARGS_MONTH_YEAR, monthYear);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public int getNavDrawerId() {
+        return R.id.nav_history;
     }
 
     @Override
@@ -117,6 +122,7 @@ public class HistoryFragment extends Fragment implements LoaderManager.LoaderCal
                 getActivity().getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.container, fragment)
+                        .addToBackStack(null)
                         .commit();
                 return true;
             default:

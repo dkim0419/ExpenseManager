@@ -14,6 +14,7 @@ import android.view.MenuItem;
 
 import com.danielkim.expensemanager.Databases.DBHelper;
 import com.danielkim.expensemanager.Fragments.HistoryFragment;
+import com.danielkim.expensemanager.Fragments.NavDrawerFragment;
 import com.danielkim.expensemanager.Fragments.OverviewFragment;
 import com.danielkim.expensemanager.R;
 
@@ -22,7 +23,9 @@ import java.util.Calendar;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    DBHelper database;
+    private DBHelper database;
+    private DrawerLayout drawer;
+    private NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,13 +34,13 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         database = new DBHelper(this);
@@ -48,18 +51,27 @@ public class MainActivity extends AppCompatActivity
                 .replace(R.id.container, fragment)
                 .commit();
         setActionBarTitle(getResources().getString(R.string.nav_overview));
+        navigationView.setCheckedItem(R.id.nav_overview);
 
         getSupportFragmentManager().addOnBackStackChangedListener(
                 new FragmentManager.OnBackStackChangedListener() {
                     public void onBackStackChanged() {
-                        // Change NavBar titles
+                        // Update Nav Drawer selection
+                        updateNavDrawerSelection();
                     }
                 });
     }
 
+    private void updateNavDrawerSelection(){
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container);
+        if (fragment instanceof NavDrawerFragment){
+            // set nav drawer selection to current active fragment
+            navigationView.setCheckedItem(((NavDrawerFragment) fragment).getNavDrawerId());
+        }
+    }
+
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -127,10 +139,10 @@ public class MainActivity extends AppCompatActivity
 
         if (fragment != null) {
             getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.container, fragment)
-                .addToBackStack(null)
-                .commit();
+                    .beginTransaction()
+                    .replace(R.id.container, fragment)
+                    .addToBackStack(null)
+                    .commit();
         }
 
         // set the toolbar title
