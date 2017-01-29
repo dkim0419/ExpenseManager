@@ -2,6 +2,7 @@ package com.danielkim.expensemanager.Activities;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
@@ -12,6 +13,9 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.content.res.AppCompatResources;
+import android.support.v7.widget.AppCompatImageButton;
+import android.text.format.DateUtils;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -21,6 +25,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import com.danielkim.expensemanager.Utils.CustomAnimation;
 import com.danielkim.expensemanager.Databases.DBContentProvider;
@@ -28,6 +33,7 @@ import com.danielkim.expensemanager.Databases.DBHelper;
 import com.danielkim.expensemanager.R;
 import com.danielkim.expensemanager.Utils.Utils;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -37,19 +43,21 @@ import java.util.Calendar;
  */
 public class AddExpenseActivity extends AppCompatActivity
     implements DatePickerDialog.OnDateSetListener{
-    private FloatingActionButton fabDone = null;
+    private Button btnAddExpense = null;
     DBHelper db;
+    SimpleDateFormat timeFormat12Hour = new SimpleDateFormat("hh:mm aa");
 
     // add_expense_header
     private TextView txtExpenseInput = null; // User inputs the expense amount
     private LinearLayout layoutNumPad = null; // Layout of the numpad
-    private Button btnCancel = null; // exit activity without adding expense
+    private AppCompatImageButton btnCancel = null; // exit activity without adding expense
 
     //add_expense_body
     private Spinner spinnerCategory = null; // Select expense category
     private Spinner spinnerPaymentMethod = null; // Select payment method
     private EditText txtNotes = null; // Add note
     private EditText txtDate = null; // Expense date. Defaults to current date. Clicking opens CalendarView
+    private EditText txtTime = null; // Expense time
 
     //numpad
     private Button btnExpandNumPad = null;
@@ -67,16 +75,19 @@ public class AddExpenseActivity extends AppCompatActivity
         db = new DBHelper(this);
         calendar = Calendar.getInstance();
 
-        fabDone = (FloatingActionButton)findViewById(R.id.fab_done);
+        btnAddExpense = (Button)findViewById(R.id.btn_add_expense_done);
         txtExpenseInput = (TextView)findViewById(R.id.txt_expense_total);
         //btnExpandNumPad = (TextView)findViewById(R.id.expand_numpad);
-        btnCancel = (Button)findViewById(R.id.btn_cancel);
+        btnCancel = (AppCompatImageButton)findViewById(R.id.btn_cancel);
         layoutNumPad = (LinearLayout)findViewById(R.id.add_expense_numpad);
+        layoutNumPad.setVisibility(View.VISIBLE);
         btnExpandNumPad = (Button)findViewById(R.id.btn_okay);
         spinnerCategory = (Spinner)findViewById(R.id.spinner_category);
         spinnerPaymentMethod = (Spinner)findViewById(R.id.spinner_payment_method);
         txtNotes = (EditText)findViewById(R.id.add_expense_note);
         txtDate = (EditText)findViewById(R.id.add_expense_date);
+        txtTime = (EditText)findViewById(R.id.add_expense_time);
+        txtTime.setText(timeFormat12Hour.format(calendar.getTime()));
         btnBackspace = (ImageButton)findViewById(R.id.btnBackspace);
         btnBackspace.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -129,6 +140,13 @@ public class AddExpenseActivity extends AppCompatActivity
             }
         });
 
+        txtTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                chooseTime();
+            }
+        });
+
         txtNotes.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -138,13 +156,12 @@ public class AddExpenseActivity extends AppCompatActivity
             }
         });
 
-        fabDone.setOnClickListener(new View.OnClickListener() {
+        btnAddExpense.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 confirmAddExpense();
             }
         });
-        fabDone.hide();
         // populate spinners with database data
         populateSpinners();
     }
@@ -153,15 +170,14 @@ public class AddExpenseActivity extends AppCompatActivity
         CustomAnimation.expand(findViewById(R.id.add_expense_numpad));
         btnExpandNumPad.setText(R.string.okay);
         btnExpandNumPad.setCompoundDrawablesWithIntrinsicBounds(null,null,null,null);
-        fabDone.hide();
     }
 
     private void onNumPadCollapse(){
         CustomAnimation.collapse(findViewById(R.id.add_expense_numpad));
-        Drawable img = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_expand_more_white_24dp);
+        //Drawable img = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_expand_more_white_24dp);
+        Drawable img = AppCompatResources.getDrawable(getApplicationContext(), R.drawable.ic_expand_more_white_24dp);
         btnExpandNumPad.setText("");
         btnExpandNumPad.setCompoundDrawablesWithIntrinsicBounds(null, null, img, null);
-        fabDone.show();
     }
 
     public void onNumPadButtonClick(View v){
@@ -192,7 +208,15 @@ public class AddExpenseActivity extends AppCompatActivity
 
     @Override
     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-        String date = (monthOfYear + 1) + " / " + dayOfMonth + " / " + year;
+        Calendar today = Calendar.getInstance();
+        String date;
+        if (year == today.get(Calendar.YEAR) &&
+                monthOfYear == today.get(Calendar.MONTH) &&
+                dayOfMonth == today.get(Calendar.DAY_OF_MONTH)){
+            date = getResources().getString(R.string.default_date);
+        }else {
+            date = (monthOfYear + 1) + " / " + dayOfMonth + " / " + year;
+        }
         txtDate.setText(date);
 
         // update calendar
@@ -207,13 +231,28 @@ public class AddExpenseActivity extends AppCompatActivity
         datePicker.show();
     }
 
+    // Open TimePicker
+    private void chooseTime(){
+        Utils.hideKeyboard(this);
+        TimePickerDialog timePicker = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                calendar.set(Calendar.MINUTE, minute);
+                txtTime.setText(timeFormat12Hour.format(calendar.getTime()));
+            }
+        }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false);
+
+        timePicker.show();
+    }
+
     // User clicks doneFab button to add expense
     private void confirmAddExpense(){
         double amount = Double.parseDouble(txtExpenseInput.getText().toString());
         if (amount == 0){
             // expense cannot be 0.
             // Open snackbar to notify user
-            Snackbar.make(findViewById(R.id.fab_done), getString(R.string.snackbar_input_amount), Snackbar.LENGTH_SHORT)
+            Snackbar.make(findViewById(R.id.btn_add_expense_done), getString(R.string.snackbar_input_amount), Snackbar.LENGTH_SHORT)
                     .show();
             return;
         }

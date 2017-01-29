@@ -3,7 +3,7 @@
     <item
             android:id="@+id/action_filter_history"
             android:orderInCategory="1"
-            android:icon="@drawable/ic_hist_filter_white_24dp"
+            android:icon="@drawable/ic_clock_white_24dp"
             app:showAsAction="always"
             android:title="@string/title_history_filter_action"/>
 </menu>

@@ -20,13 +20,13 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             style="@style/TextAppearance.AppCompat.Medium"
-            android:text="@string/add_expense_payment_method"/>
+            android:text="@string/expense_payment_method"/>
 
         <Spinner
             android:id="@+id/spinner_payment_method"
             android:spinnerMode="dropdown"
             style="@style/TextAppearance.AppCompat.Medium"
-            android:layout_width="0px"
+            android:layout_width="0dp"
             android:layout_weight="2"
             android:layout_height="wrap_content"/>
     </LinearLayout>
@@ -37,15 +37,15 @@
         android:orientation="horizontal"
         android:weightSum="3">
         <TextView
-            android:layout_width="0px"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             style="@style/TextAppearance.AppCompat.Medium"
-            android:text="@string/add_expense_category"/>
+            android:text="@string/expense_category"/>
         <Spinner
             android:id="@+id/spinner_category"
             android:layout_height="wrap_content"
-            android:layout_width="0px"
+            android:layout_width="0dp"
             android:layout_weight="2"
             style="@style/TextAppearance.AppCompat.Medium"
             android:spinnerMode="dropdown"/>
@@ -53,24 +53,23 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:paddingBottom="@dimen/activity_vertical_margin"
         android:layout_height="wrap_content"
         android:weightSum="5"
         android:orientation="horizontal">
 
         <TextView
             android:layout_weight="1"
-            android:layout_width="0px"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             style="@style/TextAppearance.AppCompat.Medium"
-            android:text="@string/add_expense_note"/>
+            android:text="@string/expense_note"/>
 
         <EditText
             android:id="@+id/add_expense_note"
             android:inputType="text"
             android:layout_weight="4"
             style="@style/TextAppearance.AppCompat.Medium"
-            android:layout_width="0px"
+            android:layout_width="0dp"
             android:layout_height="wrap_content" />
 
     </LinearLayout>
@@ -78,25 +77,34 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:weightSum="5"
-        android:layout_height="wrap_content"
-        android:paddingBottom="@dimen/activity_vertical_margin">
-
+        android:layout_height="wrap_content">
         <TextView
+            android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_width="0px"
             android:layout_height="wrap_content"
             style="@style/TextAppearance.AppCompat.Medium"
-            android:text="@string/add_expense_date"/>
+            android:text="@string/expense_date"/>
 
         <EditText
             android:id="@+id/add_expense_date"
-            android:layout_weight="4"
             android:inputType="none"
             android:focusable="false"
+            android:layout_weight="2"
             android:editable="false"
             style="@style/TextAppearance.AppCompat.Medium"
             android:text="@string/default_date"
-            android:layout_width="0px"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:id="@+id/add_expense_time"
+            android:inputType="none"
+            android:layout_weight="2"
+            android:focusable="false"
+            android:editable="false"
+            style="@style/TextAppearance.AppCompat.Medium"
+            android:text="11:11PM"
+            android:layout_width="0dp"
             android:layout_height="wrap_content" />
 
     </LinearLayout>

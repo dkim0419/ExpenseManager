@@ -2,6 +2,8 @@ package com.danielkim.expensemanager.Utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
+import android.text.format.DateUtils;
 import android.view.inputmethod.InputMethodManager;
 
 import java.text.DecimalFormat;
@@ -12,6 +14,7 @@ import java.util.GregorianCalendar;
 
 /**
  * Created by Daniel on 2/16/2016.
+ * Collection of various utils
  */
 public final class Utils {
     private Utils() {
@@ -69,5 +72,30 @@ public final class Utils {
     private static DecimalFormat twoDecimalPlaceFormat = new DecimalFormat("0.00");
     public static String formatDoubleTwoDecimalPlaces(double d){
         return twoDecimalPlaceFormat.format(d);
+    }
+
+    // format date as numeric (ie: 01/27/2017, 1:00PM)
+    public static String formatDateMillis(Context context, long dateMillis) {
+        return DateUtils.formatDateTime(
+                context,
+                dateMillis,
+                DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_NUMERIC_DATE | DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_YEAR
+        );
+    }
+
+    // format date with full month name (ie: January 1, 2017, 1:00 PM)
+    public static String formatDateMillisLong(Context context, long dateMillis) {
+        return DateUtils.formatDateTime(
+                context,
+                dateMillis,
+                DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_YEAR
+        );
+    }
+
+    public static int darkenColor(int color){
+        float[] hsv = new float[3];
+        Color.colorToHSV(color, hsv);
+        hsv[2] *= 0.8f; // value component
+        return Color.HSVToColor(hsv);
     }
 }

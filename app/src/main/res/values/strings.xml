@@ -14,14 +14,19 @@
 
     <!-- Common -->
     <string name="currency">$</string>
+    <string name="dollar_amount">$%s</string>
+
+    <!-- Expense -->
+    <string name="expense_note">Note</string>
+    <string name="expense_date">Date</string>
+    <string name="expense_payment_method">Payment Method</string>
+    <string name="expense_category">Category</string>
+    <string name="none">None</string>
 
     <!-- Add Expense Fragment-->
     <string name="snackbar_input_amount">Please specify the expense amount</string>
+    <string name="add_expense">Add Expense</string>
     <string name="default_date">Today</string>
-    <string name="add_expense_note">Note</string>
-    <string name="add_expense_date">Date</string>
-    <string name="add_expense_payment_method">Payment Method</string>
-    <string name="add_expense_category">Category</string>
     <string name="okay">Okay</string>
     <string name="num9">9</string>
     <string name="num8">8</string>

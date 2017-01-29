@@ -8,7 +8,7 @@ import com.danielkim.expensemanager.Databases.DBHelper;
 /**
  * Created by Daniel on 2/17/2016.
  */
-public class ExpenseItem{
+public class ExpenseItem implements Parcelable{
     private int id; // id of item in database
     private double amount; // amount of expense
     private long dateMillis; // date of expense in milliseconds since epoch time
@@ -19,8 +19,28 @@ public class ExpenseItem{
     public ExpenseItem() {
     }
 
-    public ExpenseItem(Parcel in){
+    private ExpenseItem(Parcel in){
+        id = in.readInt();
+        amount = in.readDouble();
+        dateMillis = in.readLong();
+        category = in.readParcelable(ExpenseCategory.class.getClassLoader());
+        paymentMethod = in.readString();
+        note = in.readString();
+    }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeDouble(amount);
+        dest.writeLong(dateMillis);
+        dest.writeParcelable(category, flags);
+        dest.writeString(paymentMethod);
+        dest.writeString(note);
     }
 
     public int getId() {
@@ -75,22 +95,10 @@ public class ExpenseItem{
         public ExpenseItem createFromParcel(Parcel in) {
             return new ExpenseItem(in);
         }
-
         public ExpenseItem[] newArray(int size) {
             return new ExpenseItem[size];
         }
     };
-
-    /*
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(id);
-        dest.writeDouble(amount);
-        dest.writeLong(dateMillis);
-        //dest.writeParcelable(category);
-        dest.writeString(paymentMethod);
-        dest.writeString(note);
-    }*/
 
     public static ExpenseItem fromCursor(Cursor c) {
         ExpenseItem item = new ExpenseItem();

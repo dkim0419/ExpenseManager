@@ -1,8 +1,10 @@
 package com.danielkim.expensemanager.Adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
@@ -10,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 
+import com.danielkim.expensemanager.Activities.ViewExpenseActivity;
 import com.danielkim.expensemanager.Models.ExpenseItem;
 import com.danielkim.expensemanager.R;
 import com.danielkim.expensemanager.Utils.Utils;
@@ -34,6 +37,7 @@ public class HistoryAdapter extends CursorRecyclerViewAdapter<HistoryAdapter.Vie
         TextView dateTxt;
         TextView paymentMethodTxt;
         ImageView circle;
+        LinearLayout layout;
         ViewHolder(View view) {
             super(view);
             categoryTxt = (TextView)view.findViewById(R.id.txt_hist_category);
@@ -41,6 +45,7 @@ public class HistoryAdapter extends CursorRecyclerViewAdapter<HistoryAdapter.Vie
             dateTxt = (TextView)view.findViewById(R.id.txt_hist_date);
             paymentMethodTxt = (TextView)view.findViewById(R.id.txt_hist_payment_method);
             circle = (ImageView)view.findViewById(R.id.circle_hist);
+            layout = (LinearLayout)view.findViewById(R.id.history_item_layout);
         }
     }
 
@@ -53,18 +58,20 @@ public class HistoryAdapter extends CursorRecyclerViewAdapter<HistoryAdapter.Vie
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, Cursor cursor) {
-        ExpenseItem item = ExpenseItem.fromCursor(cursor);
+        final ExpenseItem item = ExpenseItem.fromCursor(cursor);
         String note = item.getNote();
         viewHolder.categoryTxt.setText(note.isEmpty() ? item.getCategory().getName() : note);
-        viewHolder.amountTxt.setText("$" + Utils.formatDoubleTwoDecimalPlaces(item.getAmount()));
-        //SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.CANADA);
-        viewHolder.dateTxt.setText(DateUtils.formatDateTime(
-                mContext,
-                item.getDateMillis(),
-                DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_NUMERIC_DATE | DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_YEAR
-        ));
-
+        viewHolder.amountTxt.setText(String.format(mContext.getResources().getString(R.string.dollar_amount), Utils.formatDoubleTwoDecimalPlaces(item.getAmount())));
+        viewHolder.dateTxt.setText(Utils.formatDateMillis(mContext, item.getDateMillis()));
         viewHolder.paymentMethodTxt.setText(item.getPaymentMethod());
         viewHolder.circle.setColorFilter(Color.parseColor(item.getCategory().getColour()));
+        viewHolder.layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(mContext, ViewExpenseActivity.class);
+                i.putExtra(ViewExpenseActivity.INTENT_EXPENSE_ITEM, item);
+                mContext.startActivity(i);
+            }
+        });
     }
 }
