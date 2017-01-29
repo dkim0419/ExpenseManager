@@ -122,7 +122,6 @@ public class HistoryFragment extends Fragment implements NavDrawerFragment, Load
                 getActivity().getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.container, fragment)
-                        .addToBackStack(null)
                         .commit();
                 return true;
             default:

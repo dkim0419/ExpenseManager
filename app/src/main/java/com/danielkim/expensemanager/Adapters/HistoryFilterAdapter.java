@@ -68,7 +68,6 @@ public class HistoryFilterAdapter extends CursorRecyclerViewAdapter<HistoryFilte
                 ((MainActivity)mContext).getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.container, fragment)
-                        .addToBackStack(null)
                         .commit();
             }
         });
