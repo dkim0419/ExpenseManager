@@ -26,6 +26,7 @@ public class DBHelper extends SQLiteOpenHelper {
         public static final String COL_DATE = "date";
         public static final String COL_AMOUNT = "amount";
         public static final String COL_CATEGORY_ID = "category_id";
+        //TODO: MAKE THIS INTO AN ACTUAL ID (currently is just the payment method as string)
         public static final String COL_PAYMENT_METHOD_ID = "payment_method_id";
         public static final String COL_NOTES = "notes";
     }

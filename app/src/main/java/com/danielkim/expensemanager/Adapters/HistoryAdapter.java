@@ -15,6 +15,7 @@ import android.widget.*;
 import com.danielkim.expensemanager.Activities.ViewExpenseActivity;
 import com.danielkim.expensemanager.Models.ExpenseItem;
 import com.danielkim.expensemanager.R;
+import com.danielkim.expensemanager.Utils.MyDateUtils;
 import com.danielkim.expensemanager.Utils.Utils;
 
 /**
@@ -62,7 +63,7 @@ public class HistoryAdapter extends CursorRecyclerViewAdapter<HistoryAdapter.Vie
         String note = item.getNote();
         viewHolder.categoryTxt.setText(note.isEmpty() ? item.getCategory().getName() : note);
         viewHolder.amountTxt.setText(String.format(mContext.getResources().getString(R.string.dollar_amount), Utils.formatDoubleTwoDecimalPlaces(item.getAmount())));
-        viewHolder.dateTxt.setText(Utils.formatDateMillis(mContext, item.getDateMillis()));
+        viewHolder.dateTxt.setText(MyDateUtils.formatDateMillis(mContext, item.getDateMillis()));
         viewHolder.paymentMethodTxt.setText(item.getPaymentMethod());
         viewHolder.circle.setColorFilter(Color.parseColor(item.getCategory().getColour()));
         viewHolder.layout.setOnClickListener(new View.OnClickListener() {

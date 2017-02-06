@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
+
+import com.danielkim.expensemanager.Utils.MyDateUtils;
 import com.danielkim.expensemanager.Utils.Utils;
 
 /**
@@ -31,6 +33,9 @@ public class DBContentProvider extends ContentProvider {
 
     public static final Uri CONTENT_URI_FILTER = Uri.parse("content://" + AUTHORITY
             + "/" + BASE_PATH + "/filter");
+
+    public static final Uri CONTENT_URI_FILTER_CHART = Uri.parse("content://" + AUTHORITY
+            + "/" + BASE_PATH + "/filter_chart");
 
     private static final UriMatcher sURIMatcher = new UriMatcher(
             UriMatcher.NO_MATCH);
@@ -97,7 +102,7 @@ public class DBContentProvider extends ContentProvider {
                         + uri.getLastPathSegment());
                 break;
             case EXPENSES_FILTER:
-                groupBy = "strftime('" + Utils.MONTH_YEAR_FORMAT_SQL + "'," + DBHelper.ExpensesTable.COL_DATE + "/1000,'unixepoch')";
+                groupBy = "strftime('" + MyDateUtils.MONTH_YEAR_FORMAT_SQL + "'," + DBHelper.ExpensesTable.COL_DATE + "/1000,'unixepoch')";
                 queryBuilder.setTables(DBHelper.ExpensesTable.TABLE_EXPENSES_NAME);
                 break;
             default:

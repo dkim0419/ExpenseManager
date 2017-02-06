@@ -12,6 +12,7 @@ import com.danielkim.expensemanager.Activities.MainActivity;
 import com.danielkim.expensemanager.Fragments.HistoryFilterFragment;
 import com.danielkim.expensemanager.Fragments.HistoryFragment;
 import com.danielkim.expensemanager.R;
+import com.danielkim.expensemanager.Utils.MyDateUtils;
 import com.danielkim.expensemanager.Utils.Utils;
 
 /**
@@ -53,7 +54,7 @@ public class HistoryFilterAdapter extends CursorRecyclerViewAdapter<HistoryFilte
     @Override
     public void onBindViewHolder(ViewHolder holder, Cursor c) {
         final String monthYear = c.getString(HistoryFilterFragment.PROJECTION_DATE);
-        String monthYearFormatted = Utils.getFormattedMonthYear( c.getString(HistoryFilterFragment.PROJECTION_DATE));
+        String monthYearFormatted = MyDateUtils.getFormattedMonthYear(c.getString(HistoryFilterFragment.PROJECTION_DATE));
         String amount = Utils.formatDoubleTwoDecimalPlaces(c.getDouble(HistoryFilterFragment.PROJECTION_SUM)); // amount
         int count = c.getInt(HistoryFilterFragment.PROJECTION_COUNT);
 
@@ -64,7 +65,7 @@ public class HistoryFilterAdapter extends CursorRecyclerViewAdapter<HistoryFilte
         holder.mCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                HistoryFragment fragment = HistoryFragment.newInstance(monthYear);
+                HistoryFragment fragment = HistoryFragment.newInstance(MyDateUtils.convertMonthYearToCalendar(monthYear));
                 ((MainActivity)mContext).getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.container, fragment)

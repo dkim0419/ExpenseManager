@@ -18,7 +18,10 @@ import com.danielkim.expensemanager.Adapters.HistoryAdapter;
 import com.danielkim.expensemanager.Databases.DBContentProvider;
 import com.danielkim.expensemanager.Databases.DBHelper;
 import com.danielkim.expensemanager.R;
+import com.danielkim.expensemanager.Utils.MyDateUtils;
 import com.danielkim.expensemanager.Utils.Utils;
+
+import java.util.Calendar;
 
 /**
  * Created by Daniel on 4/21/2016.
@@ -40,20 +43,22 @@ public class HistoryFragment extends Fragment implements NavDrawerFragment, Load
                         "t1." + DBHelper.ExpensesTable.COL_NOTES
                 };
     private static final String SORT_BY = "t1." + DBHelper.ExpensesTable.COL_DATE + " DESC";
-    private static final String SELECTION = "strftime('" + Utils.MONTH_YEAR_FORMAT_SQL + "', t1." + DBHelper.ExpensesTable.COL_DATE + "/1000,'unixepoch') = ?";
+    private static final String SELECTION = "strftime('" + MyDateUtils.MONTH_YEAR_FORMAT_SQL + "', t1." + DBHelper.ExpensesTable.COL_DATE + "/1000,'unixepoch') = ?";
     private String[] selectionArgs;
 
     private LoaderManager.LoaderCallbacks<Cursor> mCallbacks;
-    private static final String ARGS_MONTH_YEAR = "monthYear";
-    private String monthYear;
+    private static final String ARGS_DISPLAYED_DATE = "calDisplayedDate";
+
+    // currently displayed month/year
+    private Calendar calDisplayedDate;
 
     public HistoryFragment() {
     }
 
-    public static HistoryFragment newInstance(String monthYear) {
+    public static HistoryFragment newInstance(Calendar cal) {
         Bundle args = new Bundle();
         HistoryFragment fragment = new HistoryFragment();
-        args.putString(ARGS_MONTH_YEAR, monthYear);
+        args.putSerializable(ARGS_DISPLAYED_DATE, cal);
         fragment.setArguments(args);
         return fragment;
     }
@@ -70,8 +75,8 @@ public class HistoryFragment extends Fragment implements NavDrawerFragment, Load
 
         // set month year to display
         Bundle args = getArguments();
-        monthYear = args.getString(ARGS_MONTH_YEAR);
-        selectionArgs = new String[] {monthYear};
+        calDisplayedDate = (Calendar) args.getSerializable(ARGS_DISPLAYED_DATE);
+        selectionArgs = new String[] {MyDateUtils.convertMonthYear(calDisplayedDate)};
         setActionBarTitle();
     }
 
@@ -82,7 +87,7 @@ public class HistoryFragment extends Fragment implements NavDrawerFragment, Load
     }
 
     private void setActionBarTitle(){
-        String title = Utils.getFormattedMonthYear(monthYear);
+        String title = MyDateUtils.getFormattedMonthYear(calDisplayedDate);
         ((MainActivity) getActivity()).setActionBarTitle(title);
     }
 

@@ -21,6 +21,7 @@ import com.danielkim.expensemanager.Adapters.OverviewAdapter;
 import com.danielkim.expensemanager.Databases.DBContentProvider;
 import com.danielkim.expensemanager.Databases.DBHelper;
 import com.danielkim.expensemanager.R;
+import com.danielkim.expensemanager.Utils.MyDateUtils;
 import com.danielkim.expensemanager.Utils.Utils;
 
 import java.util.Calendar;
@@ -43,7 +44,7 @@ public class OverviewFragment extends Fragment implements NavDrawerFragment, Loa
                         DBHelper.ExpensesTable.COL_AMOUNT,
                     };
 
-    private static final String SELECTION = "strftime('" + Utils.MONTH_YEAR_FORMAT_SQL + "', " + DBHelper.ExpensesTable.COL_DATE + "/1000,'unixepoch') = ?";
+    private static final String SELECTION = "strftime('" + MyDateUtils.MONTH_YEAR_FORMAT_SQL + "', " + DBHelper.ExpensesTable.COL_DATE + "/1000,'unixepoch') = ?";
     private String[] selectionArgs;
 
     private static final int LOADER_ID = 0;
@@ -54,10 +55,7 @@ public class OverviewFragment extends Fragment implements NavDrawerFragment, Loa
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Calendar cal = Calendar.getInstance();
-        int month = cal.get(Calendar.MONTH) + 1; // 0 indexed month
-        int year = cal.get(Calendar.YEAR);
-        selectionArgs = new String[] {String.format("%02d", month) + " " + year};
+        selectionArgs = new String[] {MyDateUtils.convertMonthYear(Calendar.getInstance())};
     }
 
     @Override

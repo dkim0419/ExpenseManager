@@ -3,8 +3,15 @@ package com.danielkim.expensemanager.Models;
 /**
  * Created by Daniel on 11/18/2016.
  */
-public enum ExpensePeriod {
-    Month,
-    Year,
-    Quarter
+
+public class ExpensePeriod {
+    public enum ExpensePeriodOption {
+        Month,
+        Year,
+        Quarter
+    }
+
+    private ExpensePeriodOption period;
+
+
 }

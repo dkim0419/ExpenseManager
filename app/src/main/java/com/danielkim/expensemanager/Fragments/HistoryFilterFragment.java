@@ -18,6 +18,7 @@ import com.danielkim.expensemanager.Adapters.HistoryFilterAdapter;
 import com.danielkim.expensemanager.Databases.DBContentProvider;
 import com.danielkim.expensemanager.Databases.DBHelper;
 import com.danielkim.expensemanager.R;
+import com.danielkim.expensemanager.Utils.MyDateUtils;
 import com.danielkim.expensemanager.Utils.Utils;
 
 /**
@@ -37,7 +38,7 @@ public class HistoryFilterFragment extends Fragment implements LoaderManager.Loa
             new String[]
                     {
                             DBHelper.ExpensesTable._ID,
-                            "strftime('" + Utils.MONTH_YEAR_FORMAT_SQL + "'," + DBHelper.ExpensesTable.COL_DATE + "/1000,'unixepoch')",
+                            "strftime('" + MyDateUtils.MONTH_YEAR_FORMAT_SQL + "'," + DBHelper.ExpensesTable.COL_DATE + "/1000,'unixepoch')",
                             "sum(" + DBHelper.ExpensesTable.COL_AMOUNT + ")",
                             "count(*)"
                     };

@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.danielkim.expensemanager.Databases.DBHelper;
+import com.danielkim.expensemanager.Fragments.ChartsFragment;
 import com.danielkim.expensemanager.Fragments.HistoryFragment;
 import com.danielkim.expensemanager.Fragments.NavDrawerFragment;
 import com.danielkim.expensemanager.Fragments.OverviewFragment;
@@ -125,12 +126,11 @@ public class MainActivity extends AppCompatActivity
                 title  = getResources().getString(R.string.nav_overview);
                 break;
             case R.id.nav_history:
-                Calendar cal = Calendar.getInstance();
-                int month = cal.get(Calendar.MONTH) + 1; // 0 indexed month
-                int year = cal.get(Calendar.YEAR);
-                fragment = HistoryFragment.newInstance(String.format("%02d", month) + " " + year);
+                fragment = HistoryFragment.newInstance(Calendar.getInstance());
                 break;
             case R.id.nav_charts:
+                fragment = ChartsFragment.newInstance(Calendar.getInstance());
+                break;
             case R.id.nav_export:
             case R.id.nav_share:
             case R.id.nav_send:

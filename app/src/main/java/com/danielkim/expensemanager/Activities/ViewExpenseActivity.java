@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.danielkim.expensemanager.Databases.DBHelper;
 import com.danielkim.expensemanager.Models.ExpenseItem;
 import com.danielkim.expensemanager.R;
+import com.danielkim.expensemanager.Utils.MyDateUtils;
 import com.danielkim.expensemanager.Utils.Utils;
 
 /**
@@ -44,7 +45,7 @@ public class ViewExpenseActivity extends AppCompatActivity {
         mCategoryTextView = (TextView) findViewById(R.id.txt_view_expense_category);
         mNoteTextView = (TextView) findViewById(R.id.txt_view_expense_note);
 
-        mDateTextView.setText(Utils.formatDateMillisLong(getApplicationContext(), item.getDateMillis()));
+        mDateTextView.setText(MyDateUtils.formatDateMillisLong(getApplicationContext(), item.getDateMillis()));
         mAmountTextView.setText(String.format(getResources().getString(R.string.dollar_amount), Utils.formatDoubleTwoDecimalPlaces(item.getAmount())));
         mPaymentMethodTextView.setText(item.getPaymentMethod());
         mCategoryTextView.setText(item.getCategory().getName());
