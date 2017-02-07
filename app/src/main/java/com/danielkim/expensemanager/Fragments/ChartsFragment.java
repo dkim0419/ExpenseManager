@@ -10,6 +10,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -25,9 +26,11 @@ import com.danielkim.expensemanager.Utils.MyDateUtils;
 import com.danielkim.expensemanager.Utils.Utils;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.PercentFormatter;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -62,7 +65,6 @@ public class ChartsFragment extends Fragment implements NavDrawerFragment, Loade
     private TextView mDate;
 
     private Calendar mCurDisplayedDate; // month-year of displayed chart data
-    private Calendar mTodayDate; // month year of current date
 
     private HashMap<ExpenseCategory, Float> expensesByCategory;
     private HashMap<String, ExpenseCategory> mapCategoryNameToCategory;
@@ -87,12 +89,10 @@ public class ChartsFragment extends Fragment implements NavDrawerFragment, Loade
         Cursor c = db.getCategories();
         expensesByCategory = new HashMap<>();
         mapCategoryNameToCategory = new HashMap<>();
-        //categoryColors = new ArrayList<>();
 
         // set month year to display
         Bundle args = getArguments();
         mCurDisplayedDate = (Calendar) args.getSerializable(ARGS_CUR_DISPLAYED_DATE);
-        mTodayDate = mCurDisplayedDate;
         selectionArgs = new String[] {MyDateUtils.convertMonthYear(mCurDisplayedDate)};
         setActionBarTitle();
     }
@@ -106,19 +106,22 @@ public class ChartsFragment extends Fragment implements NavDrawerFragment, Loade
         FrameLayout layout = (FrameLayout) v.findViewById(R.id.charts_container);
         mPieChart = new PieChart(getContext());
         mPieChart.setNoDataText(getResources().getString(R.string.chart_no_data));
-        mPieChart.setNoDataTextColor(Color.WHITE);
-        mPieChart.getLegend().setEnabled(false);
+        mPieChart.setNoDataTextColor(Color.DKGRAY);
         mPieChart.setDescription(null);
         mPieChart.setEntryLabelColor(Color.WHITE);
-        mPieChart.setTransparentCircleColor(Color.LTGRAY);
-
+        mPieChart.setUsePercentValues(true);
+        mPieChart.setDrawEntryLabels(false);
+        mPieChart.setExtraOffsets(20, 10, 20, 10);
+        mPieChart.getLegend().setWordWrapEnabled(true);
+        mPieChart.getLegend().setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
         layout.addView(mPieChart);
 
         mDate = (TextView) v.findViewById(R.id.txt_charts_date);
         mDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mCurDisplayedDate = mTodayDate; // reset display month to today
+                // reset display month to today
+                mCurDisplayedDate = Calendar.getInstance();
                 notifyDateChange(mCurDisplayedDate);
             }
         });
@@ -203,7 +206,11 @@ public class ChartsFragment extends Fragment implements NavDrawerFragment, Loade
             PieDataSet dataSet = new PieDataSet(entries, null);
             dataSet.setColors(colors);
             PieData data = new PieData(dataSet);
+            data.setValueFormatter(new PercentFormatter());
+            data.setValueTextColor(Color.WHITE);
+            data.setValueTextSize(10);
             mPieChart.setData(data);
+            mPieChart.setCenterTextSize(25);
             mPieChart.setCenterText(String.format(getResources().getString(R.string.dollar_amount),
                     Utils.formatDoubleTwoDecimalPlaces(totalAmount)));
             mPieChart.spin(0, mPieChart.getRotationAngle(), -90f, Easing.EasingOption.EaseInCirc);
