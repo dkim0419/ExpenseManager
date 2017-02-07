@@ -40,7 +40,10 @@
     <string name="num0">0</string>
     <string name="dot">.</string>
 
-    <!-- History Filter -->
+    <!-- History Filter Fragment -->
     <string name="title_history_filter_action">Filter</string>
     <string name="total_transactions">Total Transactions: %d</string>
+
+    <!-- Charts Fragment -->
+    <string name="chart_no_data">No expense data available</string>
 </resources>

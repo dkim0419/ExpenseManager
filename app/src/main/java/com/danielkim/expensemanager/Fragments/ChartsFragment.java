@@ -1,5 +1,6 @@
 package com.danielkim.expensemanager.Fragments;
 
+import android.annotation.TargetApi;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -22,6 +23,7 @@ import com.danielkim.expensemanager.Models.ExpenseCategory;
 import com.danielkim.expensemanager.R;
 import com.danielkim.expensemanager.Utils.MyDateUtils;
 import com.danielkim.expensemanager.Utils.Utils;
+import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
@@ -52,6 +54,7 @@ public class ChartsFragment extends Fragment implements NavDrawerFragment, Loade
 
     private static final String SELECTION = "strftime('" + MyDateUtils.MONTH_YEAR_FORMAT_SQL + "', t1." + DBHelper.ExpensesTable.COL_DATE + "/1000,'unixepoch') = ?";
     private String[] selectionArgs;
+    LoaderManager.LoaderCallbacks mCallbacks;
 
     private PieChart mPieChart;
     private ImageButton mNextMonthBtn;
@@ -61,9 +64,8 @@ public class ChartsFragment extends Fragment implements NavDrawerFragment, Loade
     private Calendar mCurDisplayedDate; // month-year of displayed chart data
     private Calendar mTodayDate; // month year of current date
 
-    private HashMap<String, Float> expensesByCategory;
-    private ArrayList<Integer> categoryColors;
-    private ArrayList<ExpenseCategory> allCategories;
+    private HashMap<ExpenseCategory, Float> expensesByCategory;
+    private HashMap<String, ExpenseCategory> mapCategoryNameToCategory;
 
     public static ChartsFragment newInstance(Calendar cal) {
         Bundle args = new Bundle();
@@ -84,15 +86,8 @@ public class ChartsFragment extends Fragment implements NavDrawerFragment, Loade
         db = new DBHelper(getContext());
         Cursor c = db.getCategories();
         expensesByCategory = new HashMap<>();
-        allCategories = new ArrayList<>();
-        categoryColors = new ArrayList<>();
-        // initialize hashmap with all categories
-        for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()){
-            ExpenseCategory category = ExpenseCategory.fromCursor(c);
-            expensesByCategory.put(category.getName(), 0.0f);
-            allCategories.add(category);
-            categoryColors.add(Color.parseColor(category.getColour()));
-        }
+        mapCategoryNameToCategory = new HashMap<>();
+        //categoryColors = new ArrayList<>();
 
         // set month year to display
         Bundle args = getArguments();
@@ -106,9 +101,17 @@ public class ChartsFragment extends Fragment implements NavDrawerFragment, Loade
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_charts, container, false);
+        mCallbacks = this;
 
         FrameLayout layout = (FrameLayout) v.findViewById(R.id.charts_container);
         mPieChart = new PieChart(getContext());
+        mPieChart.setNoDataText(getResources().getString(R.string.chart_no_data));
+        mPieChart.setNoDataTextColor(Color.WHITE);
+        mPieChart.getLegend().setEnabled(false);
+        mPieChart.setDescription(null);
+        mPieChart.setEntryLabelColor(Color.WHITE);
+        mPieChart.setTransparentCircleColor(Color.LTGRAY);
+
         layout.addView(mPieChart);
 
         mDate = (TextView) v.findViewById(R.id.txt_charts_date);
@@ -116,6 +119,7 @@ public class ChartsFragment extends Fragment implements NavDrawerFragment, Loade
             @Override
             public void onClick(View v) {
                 mCurDisplayedDate = mTodayDate; // reset display month to today
+                notifyDateChange(mCurDisplayedDate);
             }
         });
 
@@ -125,18 +129,21 @@ public class ChartsFragment extends Fragment implements NavDrawerFragment, Loade
         mNextMonthBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                mCurDisplayedDate.add(Calendar.MONTH, 1);
+                notifyDateChange(mCurDisplayedDate);
             }
         });
 
         mPrevMonthBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                mCurDisplayedDate.add(Calendar.MONTH, -1);
+                notifyDateChange(mCurDisplayedDate);
             }
         });
 
-        getLoaderManager().initLoader(LOADER_ID, null, this);
+        getLoaderManager().initLoader(LOADER_ID, null, mCallbacks);
+        mDate.setText(MyDateUtils.getFormattedMonthYear(mCurDisplayedDate));
 
         return v;
     }
@@ -151,27 +158,59 @@ public class ChartsFragment extends Fragment implements NavDrawerFragment, Loade
         ((MainActivity) getActivity()).setActionBarTitle(getResources().getString(R.string.nav_charts));
     }
 
+    private void resetExpensesAndCheckForNewCategories(){
+        Cursor categories = db.getCategories(); // Fetch all categories
+        // initialize hashmaps for expense amounts and category mappings
+        if (expensesByCategory != null) expensesByCategory.clear();
+        if (mapCategoryNameToCategory != null) mapCategoryNameToCategory.clear();
+        for (categories.moveToFirst(); !categories.isAfterLast(); categories.moveToNext()){
+            ExpenseCategory category = ExpenseCategory.fromCursor(categories);
+            expensesByCategory.put(category, 0.0f);
+            mapCategoryNameToCategory.put(category.getName(), category);
+        }
+    }
+
+    private void notifyDateChange(Calendar cal){
+        selectionArgs = new String[] {MyDateUtils.convertMonthYear(cal)};
+        getLoaderManager().restartLoader(LOADER_ID, null, mCallbacks);
+        mDate.setText(MyDateUtils.getFormattedMonthYear(cal));
+    }
+
     private void updateChartData(Cursor c){
+        resetExpensesAndCheckForNewCategories();
         for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()){
             String categoryName = c.getString(c.getColumnIndex(DBHelper.CategoriesTable.COL_CATEGORY));
             double amount = c.getDouble(c.getColumnIndex(DBHelper.ExpensesTable.COL_AMOUNT));
-            expensesByCategory.put(categoryName, expensesByCategory.get(categoryName) + (float)amount);
+            ExpenseCategory curCategory = mapCategoryNameToCategory.get(categoryName);
+            expensesByCategory.put(curCategory, expensesByCategory.get(curCategory) + (float)amount);
         }
 
         List<PieEntry> entries = new ArrayList<>();
-
+        List<Integer> colors = new ArrayList<>();
+        double totalAmount = 0;
         for (Map.Entry expense : expensesByCategory.entrySet()) {
             // turn your data into Entry objects
             if ((Float)expense.getValue() > 0) {
-                entries.add(new PieEntry((Float) expense.getValue(), (String)expense.getKey()));
+                float amount = (Float) expense.getValue();
+                ExpenseCategory category = (ExpenseCategory)expense.getKey();
+                entries.add(new PieEntry(amount, category.getName()));
+                colors.add(Color.parseColor(category.getColour()));
+                totalAmount += amount;
             }
         }
 
-        PieDataSet dataSet = new PieDataSet(entries, null); // TODO: pass in title for data set
-        dataSet.setColors(categoryColors);
-        PieData data = new PieData(dataSet);
-        mPieChart.setData(data);
-        mPieChart.invalidate();
+        if (entries.size() > 0){
+            PieDataSet dataSet = new PieDataSet(entries, null);
+            dataSet.setColors(colors);
+            PieData data = new PieData(dataSet);
+            mPieChart.setData(data);
+            mPieChart.setCenterText(String.format(getResources().getString(R.string.dollar_amount),
+                    Utils.formatDoubleTwoDecimalPlaces(totalAmount)));
+            mPieChart.spin(0, mPieChart.getRotationAngle(), -90f, Easing.EasingOption.EaseInCirc);
+            mPieChart.animateY(1000, Easing.EasingOption.EaseInOutQuad);
+        } else {
+            mPieChart.clear();
+        }
     }
 
     @Override

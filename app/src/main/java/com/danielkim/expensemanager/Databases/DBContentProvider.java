@@ -34,9 +34,6 @@ public class DBContentProvider extends ContentProvider {
     public static final Uri CONTENT_URI_FILTER = Uri.parse("content://" + AUTHORITY
             + "/" + BASE_PATH + "/filter");
 
-    public static final Uri CONTENT_URI_FILTER_CHART = Uri.parse("content://" + AUTHORITY
-            + "/" + BASE_PATH + "/filter_chart");
-
     private static final UriMatcher sURIMatcher = new UriMatcher(
             UriMatcher.NO_MATCH);
     static {
