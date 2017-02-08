@@ -9,6 +9,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.RelativeSizeSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +26,7 @@ import com.danielkim.expensemanager.Databases.DBHelper;
 import com.danielkim.expensemanager.R;
 import com.danielkim.expensemanager.Utils.MyDateUtils;
 import com.danielkim.expensemanager.Utils.Utils;
+import com.lb.auto_fit_textview.AutoResizeTextView;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -33,7 +37,7 @@ import java.util.Date;
 public class OverviewFragment extends Fragment implements NavDrawerFragment, LoaderManager.LoaderCallbacks<Cursor> {
     private TextView txtCurrentMonth = null;
     private FloatingActionButton fabAddExpense; // add new expense fab button
-    private TextView txtCurrentMonthExpenses = null;
+    private AutoResizeTextView txtCurrentMonthExpenses = null;
     private ScrollView overviewLayout = null;
     private OverviewAdapter adapter = null;
     private LoaderManager.LoaderCallbacks<Cursor> mCallbacks;
@@ -68,7 +72,7 @@ public class OverviewFragment extends Fragment implements NavDrawerFragment, Loa
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_overview, container, false);
         txtCurrentMonth = (TextView)v.findViewById(R.id.overview_txt_current_month);
-        txtCurrentMonthExpenses = (TextView)v.findViewById(R.id.overview_txt_current_month_expenses);
+        txtCurrentMonthExpenses = (AutoResizeTextView)v.findViewById(R.id.overview_txt_current_month_expenses);
         overviewLayout = (ScrollView)v.findViewById(R.id.overviewBody);
 
         String monthName =(String)android.text.format.DateFormat.format("MMMM", new Date());
@@ -117,8 +121,12 @@ public class OverviewFragment extends Fragment implements NavDrawerFragment, Loa
                 for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()){
                     sum += cursor.getDouble(cursor.getColumnIndex(DBHelper.ExpensesTable.COL_AMOUNT));
                 }
-
-                txtCurrentMonthExpenses.setText(Utils.formatDoubleTwoDecimalPlaces((sum)));
+                SpannableString currentExpenses =
+                        new SpannableString(
+                                String.format(getResources().getString(R.string.dollar_amount),
+                                        Utils.formatDoubleTwoDecimalPlaces((sum))));
+                currentExpenses.setSpan(new RelativeSizeSpan(0.5f), 0, 1, 0);
+                txtCurrentMonthExpenses.setText(currentExpenses);
                 break;
             default:
                 return;

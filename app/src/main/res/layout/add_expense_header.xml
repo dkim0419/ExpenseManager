@@ -9,32 +9,28 @@
     android:layout_height="wrap_content"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <RelativeLayout
+    <com.lb.auto_fit_textview.AutoResizeTextView
+        android:id="@+id/txt_expense_total"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="90dp"
+        android:gravity="right|center_vertical"
+        android:text="0"
+        android:fontFamily="sans-serif-light"
+        android:textSize="@dimen/calculator_display"
+        android:maxLines="1"
+        android:textColor="@color/white"/>
 
-        <TextView
-            android:id="@+id/txt_expense_total"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:gravity="right"
-            android:text="0"
-            android:fontFamily="sans-serif-light"
-            android:textSize="@dimen/calculator_display"
-            android:textColor="@color/white"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-light"
-            android:textColor="@color/white"
-            android:textSize="@dimen/currency_display"
-            android:text="@string/currency"
-            android:layout_centerVertical="true"
-            android:layout_toLeftOf="@+id/txt_expense_total"
-            android:layout_toStartOf="@+id/txt_expense_total" />
-    </RelativeLayout>
+    <Button
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_okay"
+        android:layout_width="wrap_content"
+        android:layout_gravity="right"
+        android:textAllCaps="true"
+        style="?android:borderlessButtonStyle"
+        android:textColor="@color/colorAccent"
+        android:textSize="18sp"
+        android:gravity="right"
+        android:text="@string/okay" />
 
     <LinearLayout
         android:id="@+id/add_expense_numpad"
@@ -50,16 +46,4 @@
 
         <include layout="@layout/numpad" />
     </LinearLayout>
-
-    <Button
-        android:layout_height="wrap_content"
-        android:id="@+id/btn_okay"
-        android:layout_width="wrap_content"
-        android:layout_gravity="right"
-        android:textAllCaps="true"
-        style="?android:borderlessButtonStyle"
-        android:textColor="@color/colorAccent"
-        android:textSize="18sp"
-        android:gravity="right"
-        android:text="@string/okay" />
 </LinearLayout>

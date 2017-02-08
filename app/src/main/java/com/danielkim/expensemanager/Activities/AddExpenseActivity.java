@@ -5,7 +5,9 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.graphics.Point;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -15,7 +17,12 @@ import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.content.res.AppCompatResources;
 import android.support.v7.widget.AppCompatImageButton;
+import android.text.Html;
+import android.text.Layout;
+import android.text.SpannableString;
 import android.text.format.DateUtils;
+import android.text.style.AlignmentSpan;
+import android.text.style.RelativeSizeSpan;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -32,6 +39,7 @@ import com.danielkim.expensemanager.Databases.DBContentProvider;
 import com.danielkim.expensemanager.Databases.DBHelper;
 import com.danielkim.expensemanager.R;
 import com.danielkim.expensemanager.Utils.Utils;
+import com.lb.auto_fit_textview.AutoResizeTextView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -48,7 +56,7 @@ public class AddExpenseActivity extends AppCompatActivity
     SimpleDateFormat timeFormat12Hour = new SimpleDateFormat("hh:mm aa");
 
     // add_expense_header
-    private TextView txtExpenseInput = null; // User inputs the expense amount
+    private AutoResizeTextView txtExpenseInput = null; // User inputs the expense amount
     private LinearLayout layoutNumPad = null; // Layout of the numpad
     private AppCompatImageButton btnCancel = null; // exit activity without adding expense
 
@@ -76,8 +84,7 @@ public class AddExpenseActivity extends AppCompatActivity
         calendar = Calendar.getInstance();
 
         btnAddExpense = (Button)findViewById(R.id.btn_add_expense_done);
-        txtExpenseInput = (TextView)findViewById(R.id.txt_expense_total);
-        //btnExpandNumPad = (TextView)findViewById(R.id.expand_numpad);
+        txtExpenseInput = (AutoResizeTextView) findViewById(R.id.txt_expense_total);
         btnCancel = (AppCompatImageButton)findViewById(R.id.btn_cancel);
         layoutNumPad = (LinearLayout)findViewById(R.id.add_expense_numpad);
         layoutNumPad.setVisibility(View.VISIBLE);
@@ -95,9 +102,9 @@ public class AddExpenseActivity extends AppCompatActivity
                 if (strExpenseTotal.length() > 0) {
                     strExpenseTotal = strExpenseTotal.substring(0, strExpenseTotal.length() - 1);
                     if (strExpenseTotal.length() == 0){
-                        txtExpenseInput.setText("0");
+                        setExpenseInputText("0");
                     } else {
-                        txtExpenseInput.setText(strExpenseTotal);
+                        setExpenseInputText(strExpenseTotal);
                     }
                 }
             }
@@ -113,6 +120,8 @@ public class AddExpenseActivity extends AppCompatActivity
                 }
             }
         });
+
+        setExpenseInputText("0");
 
         btnExpandNumPad.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -203,7 +212,7 @@ public class AddExpenseActivity extends AppCompatActivity
         }
 
         strExpenseTotal += btn.getText();
-        txtExpenseInput.setText(strExpenseTotal);
+        setExpenseInputText(strExpenseTotal);
     }
 
     @Override
@@ -221,6 +230,18 @@ public class AddExpenseActivity extends AppCompatActivity
 
         // update calendar
         calendar.set(year, monthOfYear, dayOfMonth);
+    }
+
+    private void setExpenseInputText(String text){
+        SpannableString currentExpenses =
+                new SpannableString(String.format(getResources().getString(R.string.dollar_amount), text));
+        currentExpenses.setSpan(new RelativeSizeSpan(0.5f), 0, 1, 0);
+        txtExpenseInput.setText(currentExpenses);
+    }
+
+    private double getExpenseInputAmount(){
+        String text = txtExpenseInput.getText().toString();
+        return Double.parseDouble(text.substring(1));
     }
 
     // Open CalendarView to choose date
@@ -248,7 +269,7 @@ public class AddExpenseActivity extends AppCompatActivity
 
     // User clicks doneFab button to add expense
     private void confirmAddExpense(){
-        double amount = Double.parseDouble(txtExpenseInput.getText().toString());
+        double amount = getExpenseInputAmount();
         if (amount == 0){
             // expense cannot be 0.
             // Open snackbar to notify user
