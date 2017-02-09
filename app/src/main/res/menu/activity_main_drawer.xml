@@ -4,19 +4,19 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_overview"
-            android:icon="@drawable/ic_assignment_black_24dp"
+            android:icon="@drawable/ic_overview_black_24dp"
             android:title="@string/nav_overview" />
         <item
             android:id="@+id/nav_history"
-            android:icon="@drawable/ic_schedule_black_24dp"
+            android:icon="@drawable/ic_clock_black_24dp"
             android:title="@string/nav_history" />
         <item
             android:id="@+id/nav_charts"
-            android:icon="@drawable/ic_assessment_black_24dp"
+            android:icon="@drawable/ic_chart_black_24dp"
             android:title="@string/nav_charts" />
         <item
             android:id="@+id/nav_export"
-            android:icon="@drawable/ic_description_black_24dp"
+            android:icon="@drawable/ic_export_black_24dp"
             android:title="@string/nav_export" />
     </group>
 

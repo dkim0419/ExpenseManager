@@ -13,24 +13,12 @@
         android:id="@+id/txt_expense_total"
         android:layout_width="match_parent"
         android:layout_height="90dp"
-        android:gravity="right|center_vertical"
+        android:gravity="right|bottom"
         android:text="0"
         android:fontFamily="sans-serif-light"
         android:textSize="@dimen/calculator_display"
         android:maxLines="1"
         android:textColor="@color/white"/>
-
-    <Button
-        android:layout_height="wrap_content"
-        android:id="@+id/btn_okay"
-        android:layout_width="wrap_content"
-        android:layout_gravity="right"
-        android:textAllCaps="true"
-        style="?android:borderlessButtonStyle"
-        android:textColor="@color/colorAccent"
-        android:textSize="18sp"
-        android:gravity="right"
-        android:text="@string/okay" />
 
     <LinearLayout
         android:id="@+id/add_expense_numpad"
@@ -46,4 +34,16 @@
 
         <include layout="@layout/numpad" />
     </LinearLayout>
+
+    <Button
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_okay"
+        android:layout_width="wrap_content"
+        android:layout_gravity="right"
+        android:textAllCaps="true"
+        style="?android:borderlessButtonStyle"
+        android:textColor="@color/colorAccent"
+        android:textSize="18sp"
+        android:gravity="right"
+        android:text="@string/okay" />
 </LinearLayout>

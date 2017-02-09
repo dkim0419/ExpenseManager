@@ -27,6 +27,7 @@
     <string name="snackbar_input_amount">Please specify the expense amount</string>
     <string name="add_expense">Add Expense</string>
     <string name="default_date">Today</string>
+    <string name="add_note_hint">Add Note</string>
     <string name="okay">Okay</string>
     <string name="num9">9</string>
     <string name="num8">8</string>

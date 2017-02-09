@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,7 +25,9 @@ import android.text.SpannableString;
 import android.text.format.DateUtils;
 import android.text.style.AlignmentSpan;
 import android.text.style.RelativeSizeSpan;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -160,7 +164,7 @@ public class AddExpenseActivity extends AppCompatActivity
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (!hasFocus){
-                    Utils.hideKeyboard((Activity)getApplicationContext());
+                   //Utils.hideKeyboard(getApplicationContext());
                 }
             }
         });
@@ -174,6 +178,24 @@ public class AddExpenseActivity extends AppCompatActivity
         // populate spinners with database data
         populateSpinners();
     }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_UP) {
+            View v = getCurrentFocus();
+            if ( v instanceof EditText) {
+                Rect outRect = new Rect();
+                v.getGlobalVisibleRect(outRect);
+                if (!outRect.contains((int)event.getRawX(), (int)event.getRawY())) {
+                    v.clearFocus();
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    Utils.hideKeyboard(this);
+                }
+            }
+        }
+        return super.dispatchTouchEvent( event );
+    }
+
 
     private void onNumPadExpand(){
         CustomAnimation.expand(findViewById(R.id.add_expense_numpad));
@@ -314,7 +336,7 @@ public class AddExpenseActivity extends AppCompatActivity
                         new int[] {android.R.id.text1}, 0);
         spinnerCategory.setAdapter(adapterCategories);
 
-        ArrayAdapter<String> adapterPaymentMethods = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, paymentMethods);
+        ArrayAdapter<String> adapterPaymentMethods = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, paymentMethods);
         spinnerPaymentMethod.setAdapter(adapterPaymentMethods);
 
         pmCursor.close();

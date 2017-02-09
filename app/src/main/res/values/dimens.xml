@@ -11,7 +11,7 @@
     <dimen name="text_curr_month_header">25sp</dimen>
     <dimen name="text_curr_month_expenses_header">70sp</dimen>
 
-    <!-- Add Expense Calculator -->
+    <!-- Add Expense -->
     <dimen name="calculator_display">80sp</dimen>
     <dimen name="currency_display">40sp</dimen>
     <dimen name="numpad_buttons">40sp</dimen>
