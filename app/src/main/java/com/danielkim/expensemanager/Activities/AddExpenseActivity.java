@@ -160,15 +160,6 @@ public class AddExpenseActivity extends AppCompatActivity
             }
         });
 
-        txtNotes.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus){
-                   //Utils.hideKeyboard(getApplicationContext());
-                }
-            }
-        });
-
         btnAddExpense.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -205,7 +196,6 @@ public class AddExpenseActivity extends AppCompatActivity
 
     private void onNumPadCollapse(){
         CustomAnimation.collapse(findViewById(R.id.add_expense_numpad));
-        //Drawable img = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_expand_more_white_24dp);
         Drawable img = AppCompatResources.getDrawable(getApplicationContext(), R.drawable.ic_expand_more_white_24dp);
         btnExpandNumPad.setText("");
         btnExpandNumPad.setCompoundDrawablesWithIntrinsicBounds(null, null, img, null);
