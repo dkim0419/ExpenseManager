@@ -5,5 +5,5 @@
             android:orderInCategory="1"
             android:icon="@drawable/ic_clock_white_24dp"
             app:showAsAction="always"
-            android:title="@string/title_history_filter_action"/>
+            android:title="@string/action_filter"/>
 </menu>

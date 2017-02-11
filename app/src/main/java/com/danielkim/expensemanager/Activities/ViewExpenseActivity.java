@@ -1,15 +1,17 @@
 package com.danielkim.expensemanager.Activities;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.view.View;
 import android.widget.TextView;
 
-import com.danielkim.expensemanager.Databases.DBHelper;
 import com.danielkim.expensemanager.Models.ExpenseItem;
 import com.danielkim.expensemanager.R;
 import com.danielkim.expensemanager.Utils.MyDateUtils;
@@ -22,6 +24,7 @@ import com.danielkim.expensemanager.Utils.Utils;
 public class ViewExpenseActivity extends AppCompatActivity {
     public static final String INTENT_EXPENSE_ITEM = "VIEW_EXPENSE_ITEM";
 
+    private FloatingActionButton mFab;
     private TextView mDateTextView;
     private TextView mAmountTextView;
     private TextView mPaymentMethodTextView;
@@ -37,6 +40,9 @@ public class ViewExpenseActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_expense);
+        mFab = (FloatingActionButton) findViewById(R.id.fab);
+        mFab.setOnClickListener(onFabClicked());
+
         item = getIntent().getParcelableExtra(INTENT_EXPENSE_ITEM);
         mDateTextView = (TextView) findViewById(R.id.txt_view_expense_date);
         mAmountTextView = (TextView) findViewById(R.id.txt_view_expense_amount);
@@ -68,5 +74,16 @@ public class ViewExpenseActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
         }
+    }
+
+    private View.OnClickListener onFabClicked(){
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(ViewExpenseActivity.this, AddExpenseActivity.class);
+                i.putExtra(AddExpenseActivity.VIEW_EXPENSE_ITEM_INTENT, item);
+                ViewExpenseActivity.this.startActivity(i);
+            }
+        };
     }
 }

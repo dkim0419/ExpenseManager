@@ -7,6 +7,6 @@ import android.support.v4.app.Fragment;
  * Fragments that are part of the navigation drawer
  */
 
-public interface NavDrawerFragment {
+public interface INavDrawerFragment {
     int getNavDrawerId();
 }

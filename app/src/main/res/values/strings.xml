@@ -5,6 +5,8 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+    <string name="action_filter">Filter</string>
+    <string name="action_edit">Edit</string>
 
     <!-- Nav -->
     <string name="nav_overview">Overview</string>
@@ -42,7 +44,6 @@
     <string name="dot">.</string>
 
     <!-- History Filter Fragment -->
-    <string name="title_history_filter_action">Filter</string>
     <string name="total_transactions">Total Transactions: %d</string>
 
     <!-- Charts Fragment -->

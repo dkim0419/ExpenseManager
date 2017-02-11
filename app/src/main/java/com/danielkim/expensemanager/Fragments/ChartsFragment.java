@@ -1,6 +1,5 @@
 package com.danielkim.expensemanager.Fragments;
 
-import android.annotation.TargetApi;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -10,7 +9,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -42,7 +40,7 @@ import java.util.Map;
  * Created by Daniel on 1/29/2017.
  */
 
-public class ChartsFragment extends Fragment implements NavDrawerFragment, LoaderManager.LoaderCallbacks<Cursor> {
+public class ChartsFragment extends Fragment implements INavDrawerFragment, LoaderManager.LoaderCallbacks<Cursor> {
     private DBHelper db;
     private static final int LOADER_ID = 0;
     private static final String ARGS_CUR_DISPLAYED_DATE = "mCurDisplayedDate";

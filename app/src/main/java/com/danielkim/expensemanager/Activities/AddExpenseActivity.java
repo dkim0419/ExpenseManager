@@ -5,6 +5,7 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -15,6 +16,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.content.res.AppCompatResources;
@@ -38,10 +40,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.danielkim.expensemanager.Models.ExpenseItem;
 import com.danielkim.expensemanager.Utils.CustomAnimation;
 import com.danielkim.expensemanager.Databases.DBContentProvider;
 import com.danielkim.expensemanager.Databases.DBHelper;
 import com.danielkim.expensemanager.R;
+import com.danielkim.expensemanager.Utils.MyDateUtils;
 import com.danielkim.expensemanager.Utils.Utils;
 import com.lb.auto_fit_textview.AutoResizeTextView;
 
@@ -49,12 +53,16 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import static android.view.View.GONE;
+
 /**
  * Created by Daniel on 2/14/2016.
  * Add a new expense
  */
 public class AddExpenseActivity extends AppCompatActivity
     implements DatePickerDialog.OnDateSetListener{
+    public static final String VIEW_EXPENSE_ITEM_INTENT = "expenseItem";
+
     private Button btnAddExpense = null;
     DBHelper db;
     SimpleDateFormat timeFormat12Hour = new SimpleDateFormat("hh:mm aa");
@@ -117,7 +125,7 @@ public class AddExpenseActivity extends AppCompatActivity
         txtExpenseInput.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                if (layoutNumPad.getVisibility() == View.GONE){
+                if (layoutNumPad.getVisibility() == GONE){
                     onNumPadExpand();
                 } else {
                     onNumPadCollapse();
@@ -130,7 +138,7 @@ public class AddExpenseActivity extends AppCompatActivity
         btnExpandNumPad.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                if (layoutNumPad.getVisibility() == View.GONE){
+                if (layoutNumPad.getVisibility() == GONE){
                     onNumPadExpand();
                 } else {
                     onNumPadCollapse();
@@ -168,6 +176,29 @@ public class AddExpenseActivity extends AppCompatActivity
         });
         // populate spinners with database data
         populateSpinners();
+
+        // Initialize for expense editing
+        Intent i = getIntent();
+        ExpenseItem item = i.getParcelableExtra(VIEW_EXPENSE_ITEM_INTENT);
+        if (item != null){
+            initializeForExpenseEditing(item);
+        }
+    }
+
+    private void initializeForExpenseEditing(ExpenseItem item){
+        layoutNumPad.setVisibility(View.GONE);
+        btnAddExpense.setVisibility(View.GONE);
+        onNumPadCollapse();
+
+        strExpenseTotal = Utils.formatDoubleTwoDecimalPlaces(item.getAmount());
+        setExpenseInputText(strExpenseTotal);
+        txtNotes.setText(item.getNote());
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(item.getDateMillis());
+        onDateSet(null, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
+        txtTime.setText(timeFormat12Hour.format(cal.getTime()));
+        setCategorySpinnerSelection(item.getCategory().getId());
+        setPaymentMethodSpinnerSelection(item.getPaymentMethod());
     }
 
     @Override
@@ -189,13 +220,13 @@ public class AddExpenseActivity extends AppCompatActivity
 
 
     private void onNumPadExpand(){
-        CustomAnimation.expand(findViewById(R.id.add_expense_numpad));
+        CustomAnimation.expand(layoutNumPad);
         btnExpandNumPad.setText(R.string.okay);
         btnExpandNumPad.setCompoundDrawablesWithIntrinsicBounds(null,null,null,null);
     }
 
     private void onNumPadCollapse(){
-        CustomAnimation.collapse(findViewById(R.id.add_expense_numpad));
+        CustomAnimation.collapse(layoutNumPad);
         Drawable img = AppCompatResources.getDrawable(getApplicationContext(), R.drawable.ic_expand_more_white_24dp);
         btnExpandNumPad.setText("");
         btnExpandNumPad.setCompoundDrawablesWithIntrinsicBounds(null, null, img, null);
@@ -258,15 +289,12 @@ public class AddExpenseActivity extends AppCompatActivity
 
     // Open CalendarView to choose date
     private void chooseDate(){
-        Utils.hideKeyboard(this);
-
         DatePickerDialog datePicker = new DatePickerDialog(this, this, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
         datePicker.show();
     }
 
     // Open TimePicker
     private void chooseTime(){
-        Utils.hideKeyboard(this);
         TimePickerDialog timePicker = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
@@ -279,7 +307,7 @@ public class AddExpenseActivity extends AppCompatActivity
         timePicker.show();
     }
 
-    // User clicks doneFab button to add expense
+    // User clicks button to add expense
     private void confirmAddExpense(){
         double amount = getExpenseInputAmount();
         if (amount == 0){
@@ -330,5 +358,26 @@ public class AddExpenseActivity extends AppCompatActivity
         spinnerPaymentMethod.setAdapter(adapterPaymentMethods);
 
         pmCursor.close();
+    }
+
+    //private method of your class
+    private void setPaymentMethodSpinnerSelection(String s) {
+        for (int i = 0; i < spinnerPaymentMethod.getCount(); i++){
+            if (spinnerPaymentMethod.getItemAtPosition(i).equals(s)){
+                spinnerPaymentMethod.setSelection(i);
+                break;
+            }
+        }
+    }
+
+    private void setCategorySpinnerSelection(int id){
+        for (int i = 0; i < spinnerCategory.getCount(); i++) {
+            Cursor c = (Cursor) spinnerCategory.getItemAtPosition(i);
+            int itemId = c.getInt(c.getColumnIndex(DBHelper.CategoriesTable._ID));
+            if (itemId == id) {
+                spinnerCategory.setSelection(i);
+                break;
+            }
+        }
     }
 }

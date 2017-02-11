@@ -9,7 +9,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.RelativeSizeSpan;
 import android.view.LayoutInflater;
@@ -34,7 +33,7 @@ import java.util.Date;
 /**
  * Created by Daniel on 2/17/2016.
  */
-public class OverviewFragment extends Fragment implements NavDrawerFragment, LoaderManager.LoaderCallbacks<Cursor> {
+public class OverviewFragment extends Fragment implements INavDrawerFragment, LoaderManager.LoaderCallbacks<Cursor> {
     private TextView txtCurrentMonth = null;
     private FloatingActionButton fabAddExpense; // add new expense fab button
     private AutoResizeTextView txtCurrentMonthExpenses = null;

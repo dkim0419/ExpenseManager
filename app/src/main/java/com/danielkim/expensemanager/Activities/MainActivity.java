@@ -15,7 +15,7 @@ import android.view.MenuItem;
 import com.danielkim.expensemanager.Databases.DBHelper;
 import com.danielkim.expensemanager.Fragments.ChartsFragment;
 import com.danielkim.expensemanager.Fragments.HistoryFragment;
-import com.danielkim.expensemanager.Fragments.NavDrawerFragment;
+import com.danielkim.expensemanager.Fragments.INavDrawerFragment;
 import com.danielkim.expensemanager.Fragments.OverviewFragment;
 import com.danielkim.expensemanager.R;
 
@@ -65,9 +65,9 @@ public class MainActivity extends AppCompatActivity
 
     private void updateNavDrawerSelection(){
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container);
-        if (fragment instanceof NavDrawerFragment){
+        if (fragment instanceof INavDrawerFragment){
             // set nav drawer selection to current active fragment
-            navigationView.setCheckedItem(((NavDrawerFragment) fragment).getNavDrawerId());
+            navigationView.setCheckedItem(((INavDrawerFragment) fragment).getNavDrawerId());
         }
     }
 

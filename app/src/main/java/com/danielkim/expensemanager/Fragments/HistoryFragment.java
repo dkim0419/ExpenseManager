@@ -19,14 +19,13 @@ import com.danielkim.expensemanager.Databases.DBContentProvider;
 import com.danielkim.expensemanager.Databases.DBHelper;
 import com.danielkim.expensemanager.R;
 import com.danielkim.expensemanager.Utils.MyDateUtils;
-import com.danielkim.expensemanager.Utils.Utils;
 
 import java.util.Calendar;
 
 /**
  * Created by Daniel on 4/21/2016.
  */
-public class HistoryFragment extends Fragment implements NavDrawerFragment, LoaderManager.LoaderCallbacks<Cursor> {
+public class HistoryFragment extends Fragment implements INavDrawerFragment, LoaderManager.LoaderCallbacks<Cursor> {
     private RecyclerView mRecyclerView;
     private HistoryAdapter adapter;
 
@@ -37,6 +36,7 @@ public class HistoryFragment extends Fragment implements NavDrawerFragment, Load
                         "t1." + DBHelper.ExpensesTable._ID,
                         "t1." + DBHelper.ExpensesTable.COL_DATE,
                         "t1." + DBHelper.ExpensesTable.COL_AMOUNT,
+                        "t2." + DBHelper.CategoriesTable._ID,
                         "t2." + DBHelper.CategoriesTable.COL_CATEGORY,
                         "t2." + DBHelper.CategoriesTable.COL_COLOUR,
                         "t1." + DBHelper.ExpensesTable.COL_PAYMENT_METHOD_ID,
@@ -71,7 +71,6 @@ public class HistoryFragment extends Fragment implements NavDrawerFragment, Load
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
 
         // set month year to display
         Bundle args = getArguments();
