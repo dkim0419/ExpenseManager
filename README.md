@@ -8,3 +8,4 @@ Screenshots:
 
 Libraries used:
 MPAndroidChart: https://github.com/PhilJay/MPAndroidChart
+AutoFitTextView: https://github.com/AndroidDeveloperLB/AutoFitTextView
