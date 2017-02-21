@@ -36,7 +36,7 @@ public class HistoryFragment extends Fragment implements INavDrawerFragment, Loa
                         "t1." + DBHelper.ExpensesTable._ID,
                         "t1." + DBHelper.ExpensesTable.COL_DATE,
                         "t1." + DBHelper.ExpensesTable.COL_AMOUNT,
-                        "t2." + DBHelper.CategoriesTable._ID,
+                        "t1." + DBHelper.ExpensesTable.COL_CATEGORY_ID,
                         "t2." + DBHelper.CategoriesTable.COL_CATEGORY,
                         "t2." + DBHelper.CategoriesTable.COL_COLOUR,
                         "t1." + DBHelper.ExpensesTable.COL_PAYMENT_METHOD_ID,

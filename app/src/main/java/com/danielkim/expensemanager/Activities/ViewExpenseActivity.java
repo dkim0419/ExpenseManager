@@ -12,6 +12,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
+import com.danielkim.expensemanager.Databases.DBHelper;
 import com.danielkim.expensemanager.Models.ExpenseItem;
 import com.danielkim.expensemanager.R;
 import com.danielkim.expensemanager.Utils.MyDateUtils;
@@ -50,6 +51,32 @@ public class ViewExpenseActivity extends AppCompatActivity {
         mCategoryTextView = (TextView) findViewById(R.id.txt_view_expense_category);
         mNoteTextView = (TextView) findViewById(R.id.txt_view_expense_note);
 
+        updateData(item);
+        setUpActionBar();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        DBHelper db = new DBHelper(this);
+        // fetch item again in case of updates to data
+        ExpenseItem i = db.getItemById(item.getId());
+        updateData(i);
+    }
+
+    private void setUpActionBar(){
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null){
+            actionBar.setTitle("");
+            // Add back button to go back to MainActivity
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
+        }
+    }
+
+    private void updateData(ExpenseItem i){
+        if (i == null) return;
+        item = i;
         mDateTextView.setText(MyDateUtils.formatDateMillisLong(getApplicationContext(), item.getDateMillis()));
         mAmountTextView.setText(String.format(getResources().getString(R.string.dollar_amount), Utils.formatDoubleTwoDecimalPlaces(item.getAmount())));
         mPaymentMethodTextView.setText(item.getPaymentMethod());
@@ -62,18 +89,9 @@ public class ViewExpenseActivity extends AppCompatActivity {
             getWindow().setStatusBarColor(Utils.darkenColor(mCategoryColor));
         }
 
-        setUpActionBar();
-    }
-
-    private void setUpActionBar(){
         ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null){
+        if (actionBar != null)
             actionBar.setBackgroundDrawable(new ColorDrawable(mCategoryColor));
-            actionBar.setTitle("");
-            // Add back button to go back to MainActivity
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setDisplayShowHomeEnabled(true);
-        }
     }
 
     private View.OnClickListener onFabClicked(){

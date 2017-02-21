@@ -1,35 +1,39 @@
 package com.danielkim.expensemanager.Activities;
 
-import android.app.Activity;
+import android.animation.ValueAnimator;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Point;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.CursorAdapter;
+import android.support.v4.graphics.ColorUtils;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.content.res.AppCompatResources;
 import android.support.v7.widget.AppCompatImageButton;
-import android.text.Html;
-import android.text.Layout;
+import android.support.v7.widget.Toolbar;
+import android.text.Editable;
 import android.text.SpannableString;
-import android.text.format.DateUtils;
-import android.text.style.AlignmentSpan;
+import android.text.TextWatcher;
 import android.text.style.RelativeSizeSpan;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -37,21 +41,27 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
+import com.danielkim.expensemanager.Models.ExpenseCategory;
 import com.danielkim.expensemanager.Models.ExpenseItem;
 import com.danielkim.expensemanager.Utils.CustomAnimation;
 import com.danielkim.expensemanager.Databases.DBContentProvider;
 import com.danielkim.expensemanager.Databases.DBHelper;
 import com.danielkim.expensemanager.R;
-import com.danielkim.expensemanager.Utils.MyDateUtils;
 import com.danielkim.expensemanager.Utils.Utils;
 import com.lb.auto_fit_textview.AutoResizeTextView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static android.view.View.GONE;
 
@@ -67,7 +77,13 @@ public class AddExpenseActivity extends AppCompatActivity
     DBHelper db;
     SimpleDateFormat timeFormat12Hour = new SimpleDateFormat("hh:mm aa");
 
+    // current bg color of header
+    int currentBackgroundColor = -1;
+
     // add_expense_header
+    private ViewGroup addExpenseHeader;
+    private View headerDivider;
+    private Toolbar toolbar;
     private AutoResizeTextView txtExpenseInput = null; // User inputs the expense amount
     private LinearLayout layoutNumPad = null; // Layout of the numpad
     private AppCompatImageButton btnCancel = null; // exit activity without adding expense
@@ -85,6 +101,15 @@ public class AddExpenseActivity extends AppCompatActivity
     private String strExpenseTotal = ""; //stores string of user inputted expense
     private Calendar calendar;
 
+    //edit expense
+    private Button btnSaveExpense;
+    private Button btnDiscardExpense;
+    private ExpenseItem editExpenseItem;
+    private boolean isInEditMode = false;
+    private volatile boolean areFieldsEdited = false;
+    private Lock lock = new ReentrantLock();
+    private Condition cv = lock.newCondition();
+
     public AddExpenseActivity() {
     }
 
@@ -95,6 +120,9 @@ public class AddExpenseActivity extends AppCompatActivity
         db = new DBHelper(this);
         calendar = Calendar.getInstance();
 
+        addExpenseHeader = (ViewGroup) findViewById(R.id.add_expense_header);
+        headerDivider = findViewById(R.id.divider);
+        toolbar =(Toolbar) findViewById(R.id.add_expense_toolbar);
         btnAddExpense = (Button)findViewById(R.id.btn_add_expense_done);
         txtExpenseInput = (AutoResizeTextView) findViewById(R.id.txt_expense_total);
         btnCancel = (AppCompatImageButton)findViewById(R.id.btn_cancel);
@@ -177,28 +205,103 @@ public class AddExpenseActivity extends AppCompatActivity
         // populate spinners with database data
         populateSpinners();
 
+        spinnerCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                animateBackgroundColorTransition();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
         // Initialize for expense editing
         Intent i = getIntent();
-        ExpenseItem item = i.getParcelableExtra(VIEW_EXPENSE_ITEM_INTENT);
-        if (item != null){
-            initializeForExpenseEditing(item);
+        editExpenseItem = i.getParcelableExtra(VIEW_EXPENSE_ITEM_INTENT);
+        if (editExpenseItem != null){
+            initializeForExpenseEditing(editExpenseItem);
+        } else {
+            Cursor c = (Cursor) spinnerCategory.getSelectedItem();
+            String itemColor = c.getString(c.getColumnIndex(DBHelper.CategoriesTable.COL_COLOUR));
+            currentBackgroundColor = Color.parseColor(itemColor);
         }
+        animateBackgroundColorTransition();
     }
 
     private void initializeForExpenseEditing(ExpenseItem item){
+        currentBackgroundColor = Color.parseColor(item.getCategory().getColour());
+        isInEditMode = true;
+        toolbar = (Toolbar) findViewById(R.id.add_expense_toolbar);
+        toolbar.setTitle(R.string.toolbar_edit_expense_title);
+        //toolbar.setBackgroundColor(ContextCompat.getColor(this, R.color.blue_gray));
+        btnCancel.setVisibility(View.GONE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            //getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.blue_gray_dark));
+        }
+
+        btnAddExpense.setVisibility(View.GONE);
+        findViewById(R.id.edit_expense_button_container).setVisibility(View.VISIBLE);
+        btnSaveExpense = (Button) findViewById(R.id.btn_edit_expense_save);
+        btnSaveExpense.setOnClickListener(onSaveButtonClicked());
+        btnDiscardExpense = (Button) findViewById(R.id.btn_edit_expense_discard);
+        btnDiscardExpense.setOnClickListener(onDiscardButtonClicked());
+
         layoutNumPad.setVisibility(View.GONE);
         btnAddExpense.setVisibility(View.GONE);
+        //addExpenseHeader.setBackgroundColor(ContextCompat.getColor(this, R.color.blue_gray));
+        headerDivider.setBackgroundColor(Color.DKGRAY);
         onNumPadCollapse();
 
         strExpenseTotal = Utils.formatDoubleTwoDecimalPlaces(item.getAmount());
         setExpenseInputText(strExpenseTotal);
         txtNotes.setText(item.getNote());
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(item.getDateMillis());
-        onDateSet(null, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
-        txtTime.setText(timeFormat12Hour.format(cal.getTime()));
+        calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(item.getDateMillis());
+        onDateSet(null, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+        txtTime.setText(timeFormat12Hour.format(calendar.getTime()));
         setCategorySpinnerSelection(item.getCategory().getId());
         setPaymentMethodSpinnerSelection(item.getPaymentMethod());
+
+        txtNotes.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                onFieldEdited();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+        spinnerCategory.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_UP){
+                    onFieldEdited();
+                }
+                return false;
+            }
+        });
+
+        spinnerPaymentMethod.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_UP){
+                    onFieldEdited();
+                }
+                return false;
+            }
+        });
+
+        lock.lock();
+        areFieldsEdited = false;
+        lock.unlock();
     }
 
     @Override
@@ -218,6 +321,37 @@ public class AddExpenseActivity extends AppCompatActivity
         return super.dispatchTouchEvent( event );
     }
 
+    private void animateBackgroundColorTransition(){
+        if (currentBackgroundColor == -1) return;
+        Cursor c = (Cursor) spinnerCategory.getSelectedItem();
+        String itemColor = c.getString(c.getColumnIndex(DBHelper.CategoriesTable.COL_COLOUR));
+        int colorTo = Color.parseColor(itemColor);
+        ValueAnimator colorAnimation = CustomAnimation.getColorTransitionAnimation(currentBackgroundColor, colorTo);
+        ValueAnimator colorAnimationDark = CustomAnimation.getColorTransitionAnimation(currentBackgroundColor, Utils.darkenColor(colorTo));
+        colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animator) {
+                // update background color here
+                if (toolbar != null && addExpenseHeader != null && headerDivider != null) {
+                    toolbar.setBackgroundColor((int) animator.getAnimatedValue());
+                    addExpenseHeader.setBackgroundColor((int) animator.getAnimatedValue());
+                }
+            }
+
+        });
+        colorAnimationDark.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animator) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    getWindow().setStatusBarColor((int) animator.getAnimatedValue());
+                }
+                headerDivider.setBackgroundColor((int) animator.getAnimatedValue());
+            }
+        });
+        colorAnimation.start();
+        colorAnimationDark.start();
+        currentBackgroundColor = colorTo;
+    }
 
     private void onNumPadExpand(){
         CustomAnimation.expand(layoutNumPad);
@@ -273,6 +407,7 @@ public class AddExpenseActivity extends AppCompatActivity
 
         // update calendar
         calendar.set(year, monthOfYear, dayOfMonth);
+        onFieldEdited();
     }
 
     private void setExpenseInputText(String text){
@@ -280,6 +415,7 @@ public class AddExpenseActivity extends AppCompatActivity
                 new SpannableString(String.format(getResources().getString(R.string.dollar_amount), text));
         currentExpenses.setSpan(new RelativeSizeSpan(0.5f), 0, 1, 0);
         txtExpenseInput.setText(currentExpenses);
+        onFieldEdited();
     }
 
     private double getExpenseInputAmount(){
@@ -305,26 +441,26 @@ public class AddExpenseActivity extends AppCompatActivity
         }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false);
 
         timePicker.show();
+        onFieldEdited();
     }
 
-    // User clicks button to add expense
-    private void confirmAddExpense(){
+    private ContentValues getUpdatedFieldValues(){
         double amount = getExpenseInputAmount();
         if (amount == 0){
             // expense cannot be 0.
             // Open snackbar to notify user
             Snackbar.make(findViewById(R.id.btn_add_expense_done), getString(R.string.snackbar_input_amount), Snackbar.LENGTH_SHORT)
                     .show();
-            return;
+            return null;
         }
 
         String notes = txtNotes.getText().toString();
         Cursor category = ((Cursor) spinnerCategory.getSelectedItem());
+        ExpenseCategory c = ExpenseCategory.fromCursor(category);
         long categoryId = category.getInt(category.getColumnIndex(DBHelper.CategoriesTable._ID));
         String paymentMethod = spinnerPaymentMethod.getSelectedItem().toString();
         // Store date as time since epoch
         long date = calendar.getTimeInMillis();
-        //db.insertNewExpense(date, amount, categoryId, paymentMethod, notes);
 
         ContentValues cv = new ContentValues();
         cv.put(DBHelper.ExpensesTable.COL_AMOUNT, amount);
@@ -332,9 +468,17 @@ public class AddExpenseActivity extends AppCompatActivity
         cv.put(DBHelper.ExpensesTable.COL_CATEGORY_ID, categoryId);
         cv.put(DBHelper.ExpensesTable.COL_PAYMENT_METHOD_ID, paymentMethod);
         cv.put(DBHelper.ExpensesTable.COL_NOTES, notes);
-        getContentResolver().insert(DBContentProvider.CONTENT_URI, cv);
 
-        onBackPressed(); // close activity
+        return cv;
+    }
+
+    // User clicks button to add expense
+    private void confirmAddExpense(){
+        ContentValues cv = getUpdatedFieldValues();
+        if (cv != null){
+            getContentResolver().insert(DBContentProvider.CONTENT_URI, cv);
+            onBackPressed(); // close activity
+        }
     }
 
     // Populate spinners with the categories and payment methods
@@ -360,7 +504,6 @@ public class AddExpenseActivity extends AppCompatActivity
         pmCursor.close();
     }
 
-    //private method of your class
     private void setPaymentMethodSpinnerSelection(String s) {
         for (int i = 0; i < spinnerPaymentMethod.getCount(); i++){
             if (spinnerPaymentMethod.getItemAtPosition(i).equals(s)){
@@ -380,4 +523,92 @@ public class AddExpenseActivity extends AppCompatActivity
             }
         }
     }
+
+    // Edit expense - discard
+    private View.OnClickListener onDiscardButtonClicked(){
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                lock.lock();
+                if (isInEditMode && areFieldsEdited){
+                    new AlertDialog.Builder(AddExpenseActivity.this)
+                        .setTitle(R.string.dialog_discard_title)
+                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                                finish();
+                            }
+                        })
+                        .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .show();
+                    lock.unlock();
+                } else {
+                    lock.unlock();
+                    finish();
+                }
+            }
+        };
+    }
+
+    private View.OnClickListener onSaveButtonClicked(){
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ContentValues cv = getUpdatedFieldValues();
+                lock.lock();
+                if (cv != null && isInEditMode && areFieldsEdited) {
+                    lock.unlock();
+                    final Uri uri = ContentUris.withAppendedId(DBContentProvider.CONTENT_URI, editExpenseItem.getId());
+                    getContentResolver()
+                            .update(uri, cv, null, null);
+                    Toast.makeText(getApplicationContext(),
+                            getResources().getString(R.string.toast_saved_changes), Toast.LENGTH_SHORT)
+                            .show();
+                }
+
+                finish();
+            }
+        };
+    }
+
+    private void onFieldEdited(){
+        lock.lock();
+        if (isInEditMode && !areFieldsEdited){
+            areFieldsEdited = true;
+            cv.signalAll();
+        }
+        lock.unlock();
+    }
+/*
+    private void waitToEnableSaveButton(){
+        Thread t = new Thread(){
+            @Override
+            public void run() {
+                lock.lock();
+                try {
+                    while (!areFieldsEdited){
+                        try{
+                            cv.await();
+                        } catch(InterruptedException e) {}
+                    }
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            btnSaveExpense.setEnabled(true);
+                        }
+                    });
+                } finally {
+                    lock.unlock();
+                }
+            }
+        };
+        t.start();
+    }*/
 }

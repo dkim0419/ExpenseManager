@@ -69,7 +69,47 @@
                             android:textColor="@color/white"
                             android:fontFamily="sans-serif-medium"
                             android:background="@color/colorAccent"
+                            android:foreground="?android:attr/selectableItemBackground"
                             android:layout_gravity="bottom"/>
+
+                    <LinearLayout
+                        android:id="@+id/edit_expense_button_container"
+                        android:orientation="horizontal"
+                        android:layout_gravity="bottom"
+                        android:background="@color/colorAccent"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone">
+
+                        <Button
+                            android:id="@+id/btn_edit_expense_discard"
+                            android:layout_weight="1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:text="@string/edit_expense_discard"
+                            android:textColor="@color/white"
+                            android:background="@android:color/transparent"
+                            android:foreground="?android:attr/selectableItemBackground"
+                            android:fontFamily="sans-serif-medium"/>
+
+                        <View
+                            android:layout_marginTop="10dp"
+                            android:layout_marginBottom="10dp"
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:background="@color/white"/>
+
+                        <Button
+                            android:id="@+id/btn_edit_expense_save"
+                            android:layout_weight="1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:text="@string/edit_expense_save"
+                            android:textColor="@color/white"
+                            android:background="@android:color/transparent"
+                            android:foreground="?android:attr/selectableItemBackground"
+                            android:fontFamily="sans-serif-medium"/>
+                    </LinearLayout>
                 </FrameLayout>
             </LinearLayout>
 

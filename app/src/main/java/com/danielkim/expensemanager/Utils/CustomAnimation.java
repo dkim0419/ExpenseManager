@@ -1,12 +1,17 @@
 package com.danielkim.expensemanager.Utils;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.LinearLayout;
 
-// http://stackoverflow.com/questions/4946295/android-expand-collapse-animation/13381228#13381228
+import java.util.concurrent.Callable;
+import java.util.function.Function;
+
 public final class CustomAnimation {
+    // http://stackoverflow.com/questions/4946295/android-expand-collapse-animation/13381228#13381228
     public static void expand(final View v) {
         v.measure(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         final int targetHeight = v.getMeasuredHeight();
@@ -35,6 +40,7 @@ public final class CustomAnimation {
         v.startAnimation(a);
     }
 
+    // http://stackoverflow.com/questions/4946295/android-expand-collapse-animation/13381228#13381228
     public static void collapse(final View v) {
         final int initialHeight = v.getMeasuredHeight();
 
@@ -59,5 +65,23 @@ public final class CustomAnimation {
         // 1dp/ms
         a.setDuration((int)(initialHeight / v.getContext().getResources().getDisplayMetrics().density));
         v.startAnimation(a);
+    }
+
+    //http://stackoverflow.com/questions/2614545/animate-change-of-view-background-color-on-android
+    public static ValueAnimator getColorTransitionAnimation(int colorFrom, int colorTo){
+        ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
+        colorAnimation.setDuration(250); // millisecond
+
+        return colorAnimation;
+        /*
+        colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animator) {
+                // update background color here
+                textView.setBackgroundColor((int) animator.getAnimatedValue());
+            }
+
+        });
+        colorAnimation.start();*/
     }
 }

@@ -59,7 +59,7 @@ public class HistoryAdapter extends CursorRecyclerViewAdapter<HistoryAdapter.Vie
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, Cursor cursor) {
-        final ExpenseItem item = ExpenseItem.fromCursor(cursor);
+        final ExpenseItem item = ExpenseItem.fromCursor(cursor, mContext);
         String note = item.getNote();
         viewHolder.categoryTxt.setText(note.isEmpty() ? item.getCategory().getName() : note);
         viewHolder.amountTxt.setText(String.format(mContext.getResources().getString(R.string.dollar_amount), Utils.formatDoubleTwoDecimalPlaces(item.getAmount())));

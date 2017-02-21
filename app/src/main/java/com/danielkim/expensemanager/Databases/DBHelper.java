@@ -15,6 +15,7 @@ import com.danielkim.expensemanager.Models.ExpenseItem;
 public class DBHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "expenses.db";
     private static final int DATABASE_VERSION = 1;
+    private Context mContext;
 
     // Used to insert default values into table. Prevent recursive call to getDatabase()
     private boolean isCreating = false;
@@ -72,6 +73,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        mContext = context;
     }
 
     private static void createIndex(SQLiteDatabase db, String column, String table) {
@@ -158,36 +160,16 @@ public class DBHelper extends SQLiteOpenHelper {
                 + month + "/" + year, null);
     }
 
-    public ExpenseItem getItemAt(int position){
+    public ExpenseItem getItemById(int id){
         SQLiteDatabase db = getReadableDatabase();
-        String[] projection = {
-                ExpensesTable.COL_AMOUNT,
-                ExpensesTable.COL_DATE,
-                ExpensesTable.COL_CATEGORY_ID,
-                ExpensesTable.COL_NOTES,
-                ExpensesTable.COL_PAYMENT_METHOD_ID
-        };
 
-        Cursor c = db.query(ExpensesTable.TABLE_EXPENSES_NAME, projection, null, null, null, null, null);
+        Cursor c = db.rawQuery("SELECT * FROM "
+                + ExpensesTable.TABLE_EXPENSES_NAME + " WHERE " + ExpensesTable._ID + "=" + id, null);
 
-        if (c.moveToPosition(position)){
-            ExpenseItem item = new ExpenseItem();
-            item.setId(c.getColumnIndex(ExpensesTable._ID));
-            item.setAmount(c.getDouble(c.getColumnIndex(ExpensesTable.COL_AMOUNT)));
-            Cursor category = getCategoryColourFromName(c.getString(c.getColumnIndex(ExpensesTable.COL_CATEGORY_ID)));
-            ExpenseCategory ec = new ExpenseCategory();
-            ec.setId(category.getInt(c.getColumnIndex(CategoriesTable._ID)));
-            ec.setName(category.getString(c.getColumnIndex(CategoriesTable.COL_CATEGORY)));
-            ec.setColour(category.getString(c.getColumnIndex(CategoriesTable.COL_COLOUR)));
-            item.setCategory(ec);
-            item.setDateMillis(c.getLong(c.getColumnIndex(ExpensesTable.COL_DATE)));
-            item.setNote(c.getString(c.getColumnIndex(ExpensesTable.COL_NOTES)));
-            item.setPaymentMethod(c.getString(c.getColumnIndex(ExpensesTable.COL_PAYMENT_METHOD_ID)));
-            c.close();
-            return item;
-        }
-
-        return null;
+        c.moveToFirst();
+        ExpenseItem item = ExpenseItem.fromCursor(c, mContext);
+        c.close();
+        return item;
     }
 
     public int getCount() {
@@ -238,15 +220,27 @@ public class DBHelper extends SQLiteOpenHelper {
         return c;
     }
 
+    public ExpenseCategory getCategoryFromId(int id){
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor c = db.rawQuery("SELECT * FROM "
+                + CategoriesTable.TABLE_CATEGORIES_NAME + " WHERE " + CategoriesTable._ID + "=" + id, null);
+
+        c.moveToFirst();
+
+        ExpenseCategory category = ExpenseCategory.fromCursor(c);
+        c.close();
+        return category;
+    }
+
     public Cursor getCategoryColourFromName(String name){
         SQLiteDatabase db = getReadableDatabase();
 
         Cursor c = db.rawQuery("SELECT * FROM "
-            + CategoriesTable.TABLE_CATEGORIES_NAME + "WHERE " + CategoriesTable.COL_CATEGORY + "=" + name, null);
+            + CategoriesTable.TABLE_CATEGORIES_NAME + " WHERE " + CategoriesTable.COL_CATEGORY + "=" + name, null);
 
         return c;
     }
-
 
     public Cursor getPaymentMethods(){
         SQLiteDatabase db = getReadableDatabase();

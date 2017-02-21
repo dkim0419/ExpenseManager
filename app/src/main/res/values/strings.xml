@@ -48,4 +48,13 @@
 
     <!-- Charts Fragment -->
     <string name="chart_no_data">No expense data available</string>
+
+    <!-- Edit Expense -->
+    <string name="toolbar_edit_expense_title">Edit Expense</string>
+    <string name="edit_expense_save">Save Changes</string>
+    <string name="edit_expense_discard">Discard</string>
+    <string name="dialog_discard_title">Discard changes?</string>
+    <string name="toast_saved_changes">Saved changes</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

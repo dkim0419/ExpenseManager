@@ -1,5 +1,6 @@
 package com.danielkim.expensemanager.Models;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -100,11 +101,12 @@ public class ExpenseItem implements Parcelable{
         }
     };
 
-    public static ExpenseItem fromCursor(Cursor c) {
+    public static ExpenseItem fromCursor(Cursor c, Context context) {
+        DBHelper db = new DBHelper(context);
         ExpenseItem item = new ExpenseItem();
         item.setId(c.getInt(c.getColumnIndex(DBHelper.ExpensesTable._ID)));
         item.setAmount(c.getDouble(c.getColumnIndex(DBHelper.ExpensesTable.COL_AMOUNT)));
-        ExpenseCategory category = ExpenseCategory.fromCursor(c);
+        ExpenseCategory category = db.getCategoryFromId(c.getInt(c.getColumnIndex(DBHelper.ExpensesTable.COL_CATEGORY_ID)));
         item.setCategory(category);
         item.setNote(c.getString(c.getColumnIndex(DBHelper.ExpensesTable.COL_NOTES)));
         item.setPaymentMethod(c.getString(c.getColumnIndex(DBHelper.ExpensesTable.COL_PAYMENT_METHOD_ID)));
