@@ -11,3 +11,7 @@ Libraries used:
 MPAndroidChart: https://github.com/PhilJay/MPAndroidChart
 
 AutoFitTextView: https://github.com/AndroidDeveloperLB/AutoFitTextView
+
+Launcher Icon:
+
+Assets from <a href="http://www.freepik.com">Freepik</a>
