@@ -39,6 +39,7 @@
         </android.support.design.widget.AppBarLayout>
 
         <ScrollView
+            android:theme="@style/ScrollViewGrayEdgeTheme"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:descendantFocusability="beforeDescendants"
@@ -55,62 +56,58 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
-                <include layout="@layout/add_expense_body"
-                         android:layout_width="match_parent"
-                         android:layout_height="wrap_content"/>
-                <FrameLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-                    <Button
-                            android:id="@+id/btn_add_expense_done"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/add_expense"
-                            android:textColor="@color/white"
-                            android:fontFamily="sans-serif-medium"
-                            android:background="@color/colorAccent"
-                            android:foreground="?android:attr/selectableItemBackground"
-                            android:layout_gravity="bottom"/>
+                <android.support.v7.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:elevation="10dp"
+                    android:layout_margin="7dp">
 
                     <LinearLayout
-                        android:id="@+id/edit_expense_button_container"
-                        android:orientation="horizontal"
-                        android:layout_gravity="bottom"
-                        android:background="@color/colorAccent"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:visibility="gone">
-
-                        <Button
-                            android:id="@+id/btn_edit_expense_discard"
-                            android:layout_weight="1"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:text="@string/edit_expense_discard"
-                            android:textColor="@color/white"
-                            android:background="@android:color/transparent"
-                            android:foreground="?android:attr/selectableItemBackground"
-                            android:fontFamily="sans-serif-medium"/>
-
+                        android:orientation="vertical">
+                        <include layout="@layout/add_expense_body"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
                         <View
-                            android:layout_marginTop="10dp"
-                            android:layout_marginBottom="10dp"
-                            android:layout_width="1dp"
-                            android:layout_height="match_parent"
-                            android:background="@color/white"/>
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/light_gray"/>
 
                         <Button
-                            android:id="@+id/btn_edit_expense_save"
-                            android:layout_weight="1"
-                            android:layout_width="0dp"
+                            style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                            android:id="@+id/btn_add_expense_done"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/edit_expense_save"
-                            android:textColor="@color/white"
-                            android:background="@android:color/transparent"
-                            android:foreground="?android:attr/selectableItemBackground"
-                            android:fontFamily="sans-serif-medium"/>
+                            android:text="@string/add_expense"
+                            android:fontFamily="sans-serif-medium"
+                            android:layout_gravity="bottom|end"
+                            android:visibility="visible"/>
+
+                        <LinearLayout
+                            android:id="@+id/edit_expense_button_container"
+                            android:orientation="horizontal"
+                            android:gravity="end"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:visibility="gone">
+                                <Button
+                                    android:id="@+id/btn_edit_expense_discard"
+                                    style="@style/Widget.AppCompat.Button.Borderless"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/edit_expense_discard"
+                                    android:fontFamily="sans-serif-medium"/>
+                                <Button
+                                    android:id="@+id/btn_edit_expense_save"
+                                    style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/edit_expense_save"
+                                    android:fontFamily="sans-serif-medium"/>
+                        </LinearLayout>
                     </LinearLayout>
-                </FrameLayout>
+                </android.support.v7.widget.CardView>
             </LinearLayout>
 
         </ScrollView>

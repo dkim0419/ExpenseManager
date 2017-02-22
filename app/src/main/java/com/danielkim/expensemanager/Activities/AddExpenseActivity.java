@@ -1,5 +1,6 @@
 package com.danielkim.expensemanager.Activities;
 
+import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
@@ -222,12 +223,8 @@ public class AddExpenseActivity extends AppCompatActivity
         editExpenseItem = i.getParcelableExtra(VIEW_EXPENSE_ITEM_INTENT);
         if (editExpenseItem != null){
             initializeForExpenseEditing(editExpenseItem);
-        } else {
-            Cursor c = (Cursor) spinnerCategory.getSelectedItem();
-            String itemColor = c.getString(c.getColumnIndex(DBHelper.CategoriesTable.COL_COLOUR));
-            currentBackgroundColor = Color.parseColor(itemColor);
         }
-        animateBackgroundColorTransition();
+        setStartingColors();
     }
 
     private void initializeForExpenseEditing(ExpenseItem item){
@@ -302,6 +299,20 @@ public class AddExpenseActivity extends AppCompatActivity
         lock.lock();
         areFieldsEdited = false;
         lock.unlock();
+
+        btnSaveExpense.setEnabled(false);
+        waitToEnableSaveButton();
+    }
+
+    @Override
+    public void onBackPressed() {
+        lock.lock();
+        if (isInEditMode && areFieldsEdited){
+            lock.unlock();
+            showDiscardDialog();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
@@ -321,11 +332,28 @@ public class AddExpenseActivity extends AppCompatActivity
         return super.dispatchTouchEvent( event );
     }
 
+    private void setStartingColors(){
+        Cursor c = (Cursor) spinnerCategory.getSelectedItem();
+        int color = Color.parseColor(c.getString(c.getColumnIndex(DBHelper.CategoriesTable.COL_COLOUR)));
+        int colorDark = Utils.darkenColor(color);
+
+        toolbar.setBackgroundColor(color);
+        addExpenseHeader.setBackgroundColor(color);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(colorDark);
+        }
+        headerDivider.setBackgroundColor(colorDark);
+        currentBackgroundColor = color;
+    }
+
     private void animateBackgroundColorTransition(){
         if (currentBackgroundColor == -1) return;
         Cursor c = (Cursor) spinnerCategory.getSelectedItem();
         String itemColor = c.getString(c.getColumnIndex(DBHelper.CategoriesTable.COL_COLOUR));
         int colorTo = Color.parseColor(itemColor);
+
+        if (currentBackgroundColor == colorTo) return;
+
         ValueAnimator colorAnimation = CustomAnimation.getColorTransitionAnimation(currentBackgroundColor, colorTo);
         ValueAnimator colorAnimationDark = CustomAnimation.getColorTransitionAnimation(currentBackgroundColor, Utils.darkenColor(colorTo));
         colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -348,6 +376,7 @@ public class AddExpenseActivity extends AppCompatActivity
                 headerDivider.setBackgroundColor((int) animator.getAnimatedValue());
             }
         });
+
         colorAnimation.start();
         colorAnimationDark.start();
         currentBackgroundColor = colorTo;
@@ -498,7 +527,7 @@ public class AddExpenseActivity extends AppCompatActivity
                         new int[] {android.R.id.text1}, 0);
         spinnerCategory.setAdapter(adapterCategories);
 
-        ArrayAdapter<String> adapterPaymentMethods = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, paymentMethods);
+        ArrayAdapter<String> adapterPaymentMethods = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, paymentMethods);
         spinnerPaymentMethod.setAdapter(adapterPaymentMethods);
 
         pmCursor.close();
@@ -524,6 +553,25 @@ public class AddExpenseActivity extends AppCompatActivity
         }
     }
 
+    private void showDiscardDialog(){
+        new AlertDialog.Builder(AddExpenseActivity.this)
+                .setTitle(R.string.dialog_discard_title)
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        finish();
+                    }
+                })
+                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .show();
+    }
+
     // Edit expense - discard
     private View.OnClickListener onDiscardButtonClicked(){
         return new View.OnClickListener() {
@@ -531,22 +579,7 @@ public class AddExpenseActivity extends AppCompatActivity
             public void onClick(View v) {
                 lock.lock();
                 if (isInEditMode && areFieldsEdited){
-                    new AlertDialog.Builder(AddExpenseActivity.this)
-                        .setTitle(R.string.dialog_discard_title)
-                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                                finish();
-                            }
-                        })
-                        .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        })
-                        .show();
+                    showDiscardDialog();
                     lock.unlock();
                 } else {
                     lock.unlock();
@@ -585,7 +618,7 @@ public class AddExpenseActivity extends AppCompatActivity
         }
         lock.unlock();
     }
-/*
+
     private void waitToEnableSaveButton(){
         Thread t = new Thread(){
             @Override
@@ -610,5 +643,5 @@ public class AddExpenseActivity extends AppCompatActivity
             }
         };
         t.start();
-    }*/
+    }
 }

@@ -10,4 +10,7 @@
     <color name="transparent">@android:color/transparent</color>
     <color name="blue_gray">#607D8B</color>
     <color name="blue_gray_dark">#455A64</color>
+
+    <color name="light_gray">#eeeeee</color>
+    <color name="gray">#e0e0e0</color>
 </resources>

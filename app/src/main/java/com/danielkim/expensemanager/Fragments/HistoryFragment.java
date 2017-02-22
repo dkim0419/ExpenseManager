@@ -108,6 +108,7 @@ public class HistoryFragment extends Fragment implements INavDrawerFragment, Loa
         mCallbacks = this;
         getLoaderManager().initLoader(LOADER_ID, null, mCallbacks);
 
+        setHasOptionsMenu(true);
         return v;
     }
 
