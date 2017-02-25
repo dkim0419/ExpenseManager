@@ -17,6 +17,7 @@
     <!-- Common -->
     <string name="currency">$</string>
     <string name="dollar_amount">$%s</string>
+    <string name="snackbar_undo">UNDO</string>
 
     <!-- Expense -->
     <string name="expense_note">Note</string>
@@ -51,10 +52,16 @@
 
     <!-- Edit Expense -->
     <string name="toolbar_edit_expense_title">Edit Expense</string>
+    <string name="dialog_discard_title">Discard changes?</string>
     <string name="edit_expense_save">Save Changes</string>
     <string name="edit_expense_discard">Discard</string>
-    <string name="dialog_discard_title">Discard changes?</string>
     <string name="toast_saved_changes">Saved changes</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+
+    <!-- Expense Options -->
+    <string name="delete_expense">Delete</string>
+    <string name="edit_expense">Edit</string>
+    <string name="dialog_options_title">Options</string>
+    <string name="snackbar_expense_deleted">Transaction deleted</string>
 </resources>
