@@ -18,9 +18,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 
+import com.danielkim.expensemanager.Activities.AddExpenseActivity;
+import com.danielkim.expensemanager.Activities.MainActivity;
 import com.danielkim.expensemanager.Activities.ViewExpenseActivity;
 import com.danielkim.expensemanager.Databases.DBContentProvider;
 import com.danielkim.expensemanager.Databases.DBHelper;
+import com.danielkim.expensemanager.Fragments.HistoryFragment;
 import com.danielkim.expensemanager.Models.ExpenseItem;
 import com.danielkim.expensemanager.R;
 import com.danielkim.expensemanager.Utils.MyDateUtils;
@@ -131,12 +134,14 @@ public class HistoryAdapter extends CursorRecyclerViewAdapter<HistoryAdapter.Vie
     }
 
     private void openEditExpenseActivity(ExpenseItem item){
-
+        Intent i = new Intent(mContext, AddExpenseActivity.class);
+        i.putExtra(AddExpenseActivity.VIEW_EXPENSE_ITEM_INTENT, item);
+        mContext.startActivity(i);
     }
 
     @Override
     protected void notifyCursorDataChanged(Cursor oldCursor, Cursor newCursor) {
-        if (oldCursor == null || newCursor == null){
+        if (oldCursor == null || newCursor == null || oldCursor.getCount() == newCursor.getCount()){
             notifyDataSetChanged();
             return;
         }
