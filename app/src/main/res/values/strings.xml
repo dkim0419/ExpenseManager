@@ -49,6 +49,7 @@
 
     <!-- Charts Fragment -->
     <string name="chart_no_data">No expense data available</string>
+    <string name="chart_total">Total</string>
 
     <!-- Edit Expense -->
     <string name="toolbar_edit_expense_title">Edit Expense</string>

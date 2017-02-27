@@ -6,8 +6,13 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,10 +30,13 @@ import com.danielkim.expensemanager.Utils.Utils;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -62,10 +70,14 @@ public class ChartsFragment extends Fragment implements INavDrawerFragment, Load
     private ImageButton mPrevMonthBtn;
     private TextView mDate;
 
+    // total expense amount for current month
+    private double totalAmount = 0;
+
     private Calendar mCurDisplayedDate; // month-year of displayed chart data
 
     private HashMap<ExpenseCategory, Float> expensesByCategory;
     private HashMap<String, ExpenseCategory> mapCategoryNameToCategory;
+    private List<Integer> colors;
 
     public static ChartsFragment newInstance(Calendar cal) {
         Bundle args = new Bundle();
@@ -87,6 +99,7 @@ public class ChartsFragment extends Fragment implements INavDrawerFragment, Load
         Cursor c = db.getCategories();
         expensesByCategory = new HashMap<>();
         mapCategoryNameToCategory = new HashMap<>();
+        colors = new ArrayList<>();
 
         // set month year to display
         Bundle args = getArguments();
@@ -105,12 +118,26 @@ public class ChartsFragment extends Fragment implements INavDrawerFragment, Load
         mPieChart = new PieChart(getContext());
         mPieChart.setNoDataText(getResources().getString(R.string.chart_no_data));
         mPieChart.setNoDataTextColor(Color.DKGRAY);
+        mPieChart.setRotationEnabled(false);
+        mPieChart.setHoleRadius(65);
         mPieChart.setDescription(null);
         mPieChart.setEntryLabelColor(Color.WHITE);
         mPieChart.setUsePercentValues(true);
         mPieChart.setDrawEntryLabels(false);
         mPieChart.setExtraOffsets(20, 10, 20, 10);
+        mPieChart.setCenterTextSize(25);
         mPieChart.getLegend().setWordWrapEnabled(true);
+        mPieChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(Entry e, Highlight h) {
+                setPieChartCenterText(e.getY(), ((PieEntry)e).getLabel(), (int)h.getX());
+            }
+
+            @Override
+            public void onNothingSelected() {
+                setPieChartCenterText(totalAmount, getResources().getString(R.string.chart_total), -1);
+            }
+        });
         mPieChart.getLegend().setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
         layout.addView(mPieChart);
 
@@ -159,6 +186,29 @@ public class ChartsFragment extends Fragment implements INavDrawerFragment, Load
         ((MainActivity) getActivity()).setActionBarTitle(getResources().getString(R.string.nav_charts));
     }
 
+    private void setPieChartCenterText(double amount, String category, int colorIndex){
+        int centerLabelColor;
+        int centerDataColor;
+
+        if (colorIndex != -1 && colors != null && colorIndex < colors.size()){
+            centerLabelColor = colors.get(colorIndex);
+            centerDataColor = colors.get(colorIndex);
+        } else {
+            centerLabelColor = Color.GRAY;
+            centerDataColor = ContextCompat.getColor(getContext(), R.color.black);
+        }
+
+        String amountText = String.format(category.toUpperCase() + "\n$%s",
+                Utils.formatDoubleTwoDecimalPlaces(amount));
+        int index = amountText.indexOf("\n");
+        Spannable ss = new SpannableString(amountText);
+        ss.setSpan(new RelativeSizeSpan(0.5f), 0, index, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        ss.setSpan(new ForegroundColorSpan(centerLabelColor),
+                0, index, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        mPieChart.setCenterText(ss);
+        mPieChart.setCenterTextColor(centerDataColor);
+    }
+
     private void resetExpensesAndCheckForNewCategories(){
         Cursor categories = db.getCategories(); // Fetch all categories
         // initialize hashmaps for expense amounts and category mappings
@@ -187,8 +237,8 @@ public class ChartsFragment extends Fragment implements INavDrawerFragment, Load
         }
 
         List<PieEntry> entries = new ArrayList<>();
-        List<Integer> colors = new ArrayList<>();
-        double totalAmount = 0;
+        if (colors != null) colors.clear();
+        totalAmount = 0;
         for (Map.Entry expense : expensesByCategory.entrySet()) {
             // turn your data into Entry objects
             if ((Float)expense.getValue() > 0) {
@@ -208,10 +258,8 @@ public class ChartsFragment extends Fragment implements INavDrawerFragment, Load
             data.setValueTextColor(Color.WHITE);
             data.setValueTextSize(10);
             mPieChart.setData(data);
-            mPieChart.setCenterTextSize(25);
-            mPieChart.setCenterText(String.format(getResources().getString(R.string.dollar_amount),
-                    Utils.formatDoubleTwoDecimalPlaces(totalAmount)));
-            mPieChart.spin(0, mPieChart.getRotationAngle(), -90f, Easing.EasingOption.EaseInCirc);
+            setPieChartCenterText(totalAmount, getResources().getString(R.string.chart_total), -1);
+
             mPieChart.animateY(1000, Easing.EasingOption.EaseInOutQuad);
         } else {
             mPieChart.clear();
