@@ -12,6 +12,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,6 +50,7 @@ public class HistoryAdapter extends CursorRecyclerViewAdapter<HistoryAdapter.Vie
         TextView dateTxt;
         TextView paymentMethodTxt;
         ImageView circle;
+        TextView circleText;
         LinearLayout layout;
         ViewHolder(View view) {
             super(view);
@@ -57,6 +59,7 @@ public class HistoryAdapter extends CursorRecyclerViewAdapter<HistoryAdapter.Vie
             dateTxt = (TextView)view.findViewById(R.id.txt_hist_date);
             paymentMethodTxt = (TextView)view.findViewById(R.id.txt_hist_payment_method);
             circle = (ImageView)view.findViewById(R.id.circle_hist);
+            circleText = (TextView)view.findViewById(R.id.circle_text);
             layout = (LinearLayout)view.findViewById(R.id.history_item_layout);
         }
     }
@@ -77,6 +80,7 @@ public class HistoryAdapter extends CursorRecyclerViewAdapter<HistoryAdapter.Vie
         viewHolder.dateTxt.setText(MyDateUtils.formatDateMillis(mContext, item.getDateMillis()));
         viewHolder.paymentMethodTxt.setText(item.getPaymentMethod());
         viewHolder.circle.setColorFilter(Color.parseColor(item.getCategory().getColour()));
+        viewHolder.circleText.setText(viewHolder.categoryTxt.getText().subSequence(0, 1));
         viewHolder.layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

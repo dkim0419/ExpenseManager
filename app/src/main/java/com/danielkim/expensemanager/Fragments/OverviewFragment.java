@@ -8,9 +8,12 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,12 +33,20 @@ import com.danielkim.expensemanager.Utils.MyDateUtils;
 import com.danielkim.expensemanager.Utils.Utils;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.HorizontalBarChart;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.IValueFormatter;
+import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ViewPortHandler;
@@ -73,10 +84,12 @@ public class OverviewFragment extends Fragment implements INavDrawerFragment, Lo
 
     private static final int LOADER_ID = 0;
 
-    private HorizontalBarChart mBarChart;
-    private HashMap<ExpenseCategory, Float> expensesByCategory;
+   // private HorizontalBarChart mBarChart;
+    private PieChart mPieChart;
+    private Map<ExpenseCategory, Float> expensesByCategory;
     private HashMap<String, ExpenseCategory> mapCategoryNameToCategory;
     private List<Integer> colors;
+    //private List<String> labels;
     private DBHelper db;
     private double totalAmount = 0;
 
@@ -91,6 +104,7 @@ public class OverviewFragment extends Fragment implements INavDrawerFragment, Lo
         expensesByCategory = new HashMap<>();
         mapCategoryNameToCategory = new HashMap<>();
         colors = new ArrayList<>();
+        //labels = new ArrayList<>();
     }
 
     @Override
@@ -119,10 +133,11 @@ public class OverviewFragment extends Fragment implements INavDrawerFragment, Lo
             });
         }
 
+        /*
         mBarChart = new HorizontalBarChart(getContext());
         mBarChart.getLegend().setEnabled(false);
         mBarChart.setDescription(null);
-        mBarChart.getXAxis().setDrawLabels(false);
+        mBarChart.getXAxis().setDrawLabels(true);
         mBarChart.getAxisLeft().setDrawLabels(false);
         mBarChart.getAxisRight().setDrawLabels(false);
         mBarChart.getAxisLeft().setDrawGridLines(false);
@@ -132,9 +147,35 @@ public class OverviewFragment extends Fragment implements INavDrawerFragment, Lo
         mBarChart.getXAxis().setDrawAxisLine(false);
         mBarChart.getAxisRight().setDrawAxisLine(false);
         mBarChart.getAxisLeft().setDrawAxisLine(false);
-        mBarChart.setScaleEnabled(false);
-
+        //mBarChart.setScaleEnabled(false);
         overviewLayout.addView(mBarChart);
+        */
+
+        mPieChart = new PieChart(getContext());
+        mPieChart.setNoDataText(getResources().getString(R.string.chart_no_data));
+        mPieChart.setNoDataTextColor(Color.DKGRAY);
+        mPieChart.setRotationEnabled(false);
+        mPieChart.getLegend().setEnabled(false);
+        mPieChart.setHoleRadius(65);
+        mPieChart.setDescription(null);
+        mPieChart.setEntryLabelColor(Color.WHITE);
+        mPieChart.setUsePercentValues(true);
+        mPieChart.setDrawEntryLabels(false);
+        mPieChart.setExtraOffsets(20, 10, 20, 10);
+        mPieChart.setCenterTextSize(25);
+        mPieChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(Entry e, Highlight h) {
+                setPieChartCenterText(e.getY(), ((PieEntry)e).getLabel(), (int)h.getX());
+            }
+
+            @Override
+            public void onNothingSelected() {
+                setPieChartCenterText(totalAmount, getResources().getString(R.string.chart_total), -1);
+            }
+        });
+        mPieChart.getLegend().setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
+        overviewLayout.addView(mPieChart);
 
         mCallbacks = this;
         getLoaderManager().initLoader(LOADER_ID, null, mCallbacks);
@@ -169,6 +210,7 @@ public class OverviewFragment extends Fragment implements INavDrawerFragment, Lo
         }
     }
 
+    /*
     private void updateChartData(Cursor c){
         resetExpensesAndCheckForNewCategories();
         for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()){
@@ -179,14 +221,15 @@ public class OverviewFragment extends Fragment implements INavDrawerFragment, Lo
         }
 
         List<BarEntry> entries = new ArrayList<>();
-        List<String> labels = new ArrayList<>();
+        if (labels != null) labels.clear();
         if (colors != null) colors.clear();
         totalAmount = 0;
         int i = 0;
+        expensesByCategory = Utils.sortByValue(expensesByCategory);
         for (Map.Entry expense : expensesByCategory.entrySet()) {
             // turn your data into Entry objects
-            if ((Float)expense.getValue() > 0) {
-                float amount = (Float) expense.getValue();
+            float amount = (Float) expense.getValue();
+            if (amount > 0) {
                 ExpenseCategory category = (ExpenseCategory)expense.getKey();
                 entries.add(new BarEntry(i, new float[] {amount}, category.getName()));
                 labels.add(category.getName());
@@ -198,16 +241,32 @@ public class OverviewFragment extends Fragment implements INavDrawerFragment, Lo
 
         if (entries.size() > 0){
             BarDataSet dataSet = new BarDataSet(entries, null);
+            dataSet.setHighLightAlpha(0);
             dataSet.setColors(colors);
-            /*
+
             dataSet.setValueFormatter(new IValueFormatter() {
                 @Override
                 public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
-                    return entry.getData().toString();
+                    return "";
+                    return String.format(
+                            getResources().getString(R.string.dollar_amount),
+                            Utils.formatDoubleTwoDecimalPlaces(value));
                 }
-            });*/
+            });
 
             BarData data = new BarData(dataSet);
+            IAxisValueFormatter formatter = new IAxisValueFormatter() {
+                @Override
+                public String getFormattedValue(float value, AxisBase axis) {
+                    if (value < 0 || value >= labels.size()) {
+                        return "";
+                    }
+                    return labels.get((int) value);
+                }
+            };
+            mBarChart.getXAxis().setValueFormatter(formatter);
+            mBarChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+
             data.setValueTextColor(Color.BLACK);
             data.setValueTextSize(10);
             mBarChart.setData(data);
@@ -215,6 +274,72 @@ public class OverviewFragment extends Fragment implements INavDrawerFragment, Lo
         } else {
             mBarChart.clear();
         }
+    }*/
+
+    private void updateChartData(Cursor c){
+        resetExpensesAndCheckForNewCategories();
+        for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()){
+            String categoryName = c.getString(c.getColumnIndex(DBHelper.CategoriesTable.COL_CATEGORY));
+            double amount = c.getDouble(c.getColumnIndex(DBHelper.ExpensesTable.COL_AMOUNT));
+            ExpenseCategory curCategory = mapCategoryNameToCategory.get(categoryName);
+            expensesByCategory.put(curCategory, expensesByCategory.get(curCategory) + (float)amount);
+        }
+
+        List<PieEntry> entries = new ArrayList<>();
+        if (colors != null) colors.clear();
+        totalAmount = 0;
+        for (Map.Entry expense : expensesByCategory.entrySet()) {
+            // turn your data into Entry objects
+            if ((Float)expense.getValue() > 0) {
+                float amount = (Float) expense.getValue();
+                ExpenseCategory category = (ExpenseCategory)expense.getKey();
+                entries.add(new PieEntry(amount, category.getName()));
+                colors.add(Color.parseColor(category.getColour()));
+                totalAmount += amount;
+            }
+        }
+
+        if (entries.size() > 0){
+            PieDataSet dataSet = new PieDataSet(entries, null);
+            dataSet.setColors(colors);
+            PieData data = new PieData(dataSet);
+            data.setValueFormatter(new PercentFormatter());
+            data.setValueTextColor(Color.WHITE);
+            data.setValueTextSize(10);
+            mPieChart.setData(data);
+            setPieChartCenterText(totalAmount, getResources().getString(R.string.chart_total), -1);
+
+            mPieChart.animateY(1000, Easing.EasingOption.EaseInOutQuad);
+        } else {
+            mPieChart.clear();
+        }
+    }
+
+    private void setPieChartCenterText(double amount, String category, int colorIndex){
+        int centerLabelColor;
+        int centerDataColor;
+
+        if (colorIndex != -1 && colors != null && colorIndex < colors.size()){
+            centerLabelColor = colors.get(colorIndex);
+            centerDataColor = colors.get(colorIndex);
+            mPieChart.setCenterTextSize(25);
+        } else {
+            // TODO: Emoji changes based on user's set monthly budget
+            mPieChart.setCenterText("☺");
+            mPieChart.setCenterTextSize(50);
+            mPieChart.setCenterTextColor(Color.BLACK);
+            return;
+        }
+
+        String amountText = String.format(category.toUpperCase() + "\n$%s",
+                Utils.formatDoubleTwoDecimalPlaces(amount));
+        int index = amountText.indexOf("\n");
+        Spannable ss = new SpannableString(amountText);
+        ss.setSpan(new RelativeSizeSpan(0.5f), 0, index, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        ss.setSpan(new ForegroundColorSpan(centerLabelColor),
+                0, index, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        mPieChart.setCenterText(ss);
+        mPieChart.setCenterTextColor(centerDataColor);
     }
 
     @Override
