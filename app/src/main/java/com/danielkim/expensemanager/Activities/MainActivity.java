@@ -132,8 +132,6 @@ public class MainActivity extends AppCompatActivity
                 fragment = ChartsFragment.newInstance(Calendar.getInstance());
                 break;
             case R.id.nav_export:
-            case R.id.nav_share:
-            case R.id.nav_send:
                 break;
         }
 
