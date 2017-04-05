@@ -43,7 +43,7 @@ public class HistoryFragment extends Fragment implements INavDrawerFragment, Loa
                         "t1." + DBHelper.ExpensesTable.COL_NOTES
                 };
     private static final String SORT_BY = "t1." + DBHelper.ExpensesTable.COL_DATE + " DESC";
-    private static final String SELECTION = "strftime('" + MyDateUtils.MONTH_YEAR_FORMAT_SQL + "', t1." + DBHelper.ExpensesTable.COL_DATE + "/1000,'unixepoch') = ?";
+    private static final String SELECTION = "strftime('" + MyDateUtils.MONTH_YEAR_FORMAT_SQL + "', t1." + DBHelper.ExpensesTable.COL_DATE + "/1000,'unixepoch','localtime') = ?";
     private String[] selectionArgs;
 
     private LoaderManager.LoaderCallbacks<Cursor> mCallbacks;

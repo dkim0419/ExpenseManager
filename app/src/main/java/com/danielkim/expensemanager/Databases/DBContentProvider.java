@@ -99,7 +99,7 @@ public class DBContentProvider extends ContentProvider {
                         + uri.getLastPathSegment());
                 break;
             case EXPENSES_FILTER:
-                groupBy = "strftime('" + MyDateUtils.MONTH_YEAR_FORMAT_SQL + "'," + DBHelper.ExpensesTable.COL_DATE + "/1000,'unixepoch')";
+                groupBy = "strftime('" + MyDateUtils.MONTH_YEAR_FORMAT_SQL + "'," + DBHelper.ExpensesTable.COL_DATE + "/1000,'unixepoch', 'localtime')";
                 queryBuilder.setTables(DBHelper.ExpensesTable.TABLE_EXPENSES_NAME);
                 break;
             default:

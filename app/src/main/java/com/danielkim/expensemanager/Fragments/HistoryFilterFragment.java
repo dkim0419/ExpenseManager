@@ -38,7 +38,7 @@ public class HistoryFilterFragment extends Fragment implements LoaderManager.Loa
             new String[]
                     {
                             DBHelper.ExpensesTable._ID,
-                            "strftime('" + MyDateUtils.MONTH_YEAR_FORMAT_SQL + "'," + DBHelper.ExpensesTable.COL_DATE + "/1000,'unixepoch')",
+                            "strftime('" + MyDateUtils.MONTH_YEAR_FORMAT_SQL + "'," + DBHelper.ExpensesTable.COL_DATE + "/1000,'unixepoch', 'localtime')",
                             "sum(" + DBHelper.ExpensesTable.COL_AMOUNT + ")",
                             "count(*)"
                     };
