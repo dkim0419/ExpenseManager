@@ -80,6 +80,9 @@ public class ViewCategoryPMActivity extends AppCompatActivity implements LoaderM
         if (actionBar != null) {
             if(mViewType == ViewType.Category) actionBar.setTitle(R.string.pref_add_category_title);
             else actionBar.setTitle(R.string.pref_add_payment_method_title);
+
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
         }
     }
 
