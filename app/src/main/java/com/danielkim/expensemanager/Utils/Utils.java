@@ -74,4 +74,8 @@ public final class Utils {
         DrawableCompat.setTint(wrappedDrawable, color);
         return wrappedDrawable;
     }
+
+    public static String getColorHex(int color) {
+        return String.format("#%06X", (0xFFFFFF & color));
+    }
 }

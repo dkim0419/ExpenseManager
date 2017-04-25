@@ -13,6 +13,7 @@ public class ExpenseCategory implements Parcelable {
     private int id;
     private String name;
     private String colour;
+    private boolean isVisible;
 
     public ExpenseCategory(){
     }
@@ -21,6 +22,7 @@ public class ExpenseCategory implements Parcelable {
         id = in.readInt();
         name = in.readString();
         colour = in.readString();
+        isVisible = in.readByte() != 0;
     }
 
     @Override
@@ -33,6 +35,7 @@ public class ExpenseCategory implements Parcelable {
         dest.writeInt(id);
         dest.writeString(name);
         dest.writeString(colour);
+        dest.writeByte((byte)(isVisible ? 1 : 0));
     }
 
     public static final Creator<ExpenseCategory> CREATOR = new Creator<ExpenseCategory>() {
@@ -59,6 +62,10 @@ public class ExpenseCategory implements Parcelable {
         this.colour = colour;
     }
 
+    public void setIsVisible(boolean visible) {
+        this.isVisible = visible;
+    }
+
     public int getId() {return id;}
 
     public String getName() {
@@ -69,11 +76,16 @@ public class ExpenseCategory implements Parcelable {
         return colour;
     }
 
+    public boolean isVisible() {
+        return isVisible;
+    }
+
     public static ExpenseCategory fromCursor(Cursor c) {
         ExpenseCategory category = new ExpenseCategory();
         category.setId(c.getInt(c.getColumnIndex(DBHelper.CategoriesTable._ID)));
         category.setName(c.getString(c.getColumnIndex(DBHelper.CategoriesTable.COL_CATEGORY)));
         category.setColour(c.getString(c.getColumnIndex(DBHelper.CategoriesTable.COL_COLOUR)));
+        category.setIsVisible(c.getInt(c.getColumnIndex(DBHelper.CategoriesTable.COL_VISIBLE)) != 0);
         return category;
     }
 }

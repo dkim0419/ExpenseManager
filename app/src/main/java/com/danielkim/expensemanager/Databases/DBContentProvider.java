@@ -26,13 +26,19 @@ public class DBContentProvider extends ContentProvider {
     private static final int EXPENSES_NOTES = 7;
     private static final int EXPENSES_FILTER = 8;
 
+    private static final int CATEGORIES = 9;
+    private static final int CATEGORIES_ID = 10;
+
     private static final String AUTHORITY = "com.danielkim.expensemanager.Databases.DBContentProvider";
     private static final String BASE_PATH = "expenses";
+    private static final String BASE_PATH_CATEGORIES = "categories";
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY
             + "/" + BASE_PATH);
 
     public static final Uri CONTENT_URI_FILTER = Uri.parse("content://" + AUTHORITY
             + "/" + BASE_PATH + "/filter");
+
+    public static final Uri CONTENT_URI_CATEGORIES = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH_CATEGORIES);
 
     private static final UriMatcher sURIMatcher = new UriMatcher(
             UriMatcher.NO_MATCH);
@@ -45,6 +51,9 @@ public class DBContentProvider extends ContentProvider {
         sURIMatcher.addURI(AUTHORITY, BASE_PATH + "/#/payment_method_id", EXPENSES_PAYMENT_METHOD);
         sURIMatcher.addURI(AUTHORITY, BASE_PATH + "/#/notes", EXPENSES_NOTES);
         sURIMatcher.addURI(AUTHORITY, BASE_PATH + "/filter", EXPENSES_FILTER);
+
+        sURIMatcher.addURI(AUTHORITY, BASE_PATH_CATEGORIES, CATEGORIES);
+        sURIMatcher.addURI(AUTHORITY, BASE_PATH_CATEGORIES + "/#", CATEGORIES_ID);
     }
 
     @Override
@@ -102,6 +111,9 @@ public class DBContentProvider extends ContentProvider {
                 groupBy = "strftime('" + MyDateUtils.MONTH_YEAR_FORMAT_SQL + "'," + DBHelper.ExpensesTable.COL_DATE + "/1000,'unixepoch', 'localtime')";
                 queryBuilder.setTables(DBHelper.ExpensesTable.TABLE_EXPENSES_NAME);
                 break;
+            case CATEGORIES:
+                queryBuilder.setTables(DBHelper.CategoriesTable.TABLE_CATEGORIES_NAME);
+                break;
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
         }
@@ -128,6 +140,9 @@ public class DBContentProvider extends ContentProvider {
         switch (uriType) {
             case EXPENSES:
                 id = sqlDB.insert(DBHelper.ExpensesTable.TABLE_EXPENSES_NAME, null, contentValues);
+                break;
+            case CATEGORIES:
+                id = sqlDB.insert(DBHelper.CategoriesTable.TABLE_CATEGORIES_NAME, null, contentValues);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
@@ -161,6 +176,26 @@ public class DBContentProvider extends ContentProvider {
                             selectionArgs);
                 }
                 break;
+            case CATEGORIES:
+                rowsDeleted = sqlDB.delete(DBHelper.CategoriesTable.TABLE_CATEGORIES_NAME, selection,
+                        selectionArgs);
+                break;
+            case CATEGORIES_ID:
+                id = uri.getLastPathSegment();
+                if (TextUtils.isEmpty(selection)) {
+                    rowsDeleted = sqlDB.delete(
+                            DBHelper.CategoriesTable.TABLE_CATEGORIES_NAME,
+                            DBHelper.CategoriesTable._ID + "=" + id,
+                            null);
+                } else {
+                    rowsDeleted = sqlDB.delete(
+                            DBHelper.CategoriesTable.TABLE_CATEGORIES_NAME,
+                            DBHelper.CategoriesTable._ID + "=" + id
+                                    + " and " + selection,
+                            selectionArgs);
+                }
+                break;
+
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
         }
@@ -189,6 +224,28 @@ public class DBContentProvider extends ContentProvider {
                             null);
                 } else {
                     rowsUpdated = sqlDB.update(DBHelper.ExpensesTable.TABLE_EXPENSES_NAME,
+                            values,
+                            DBHelper.ExpensesTable._ID + "=" + id
+                                    + " and "
+                                    + selection,
+                            selectionArgs);
+                }
+                break;
+            case CATEGORIES:
+                rowsUpdated = sqlDB.update(DBHelper.CategoriesTable.TABLE_CATEGORIES_NAME,
+                        values,
+                        selection,
+                        selectionArgs);
+                break;
+            case CATEGORIES_ID:
+                id = uri.getLastPathSegment();
+                if (TextUtils.isEmpty(selection)) {
+                    rowsUpdated = sqlDB.update(DBHelper.CategoriesTable.TABLE_CATEGORIES_NAME,
+                            values,
+                            DBHelper.CategoriesTable._ID + "=" + id,
+                            null);
+                } else {
+                    rowsUpdated = sqlDB.update(DBHelper.CategoriesTable.TABLE_CATEGORIES_NAME,
                             values,
                             DBHelper.ExpensesTable._ID + "=" + id
                                     + " and "

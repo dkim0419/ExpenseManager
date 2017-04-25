@@ -25,6 +25,11 @@
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
+            android:name=".Activities.MyPreferenceActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
             android:name=".Activities.ViewExpenseActivity"
             android:label="@string/app_name"
             android:parentActivityName=".Activities.MainActivity">
@@ -32,6 +37,11 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".Activities.MainActivity" />
+        </activity>
+        <activity
+            android:name=".Activities.ViewCategoryPMActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme">
         </activity>
         <provider android:name=".Databases.DBContentProvider"
                   android:authorities="com.danielkim.expensemanager.Databases.DBContentProvider" />

@@ -512,8 +512,8 @@ public class AddExpenseActivity extends AppCompatActivity
 
     // Populate spinners with the categories and payment methods
     private void populateSpinners(){
-        Cursor categoriesCursor = db.getCategories();
-        Cursor pmCursor = db.getPaymentMethods();
+        Cursor categoriesCursor = db.getVisibleCategories();
+        Cursor pmCursor = db.getVisiblePaymentMethods();
 
         ArrayList<String> paymentMethods = new ArrayList<>();
 

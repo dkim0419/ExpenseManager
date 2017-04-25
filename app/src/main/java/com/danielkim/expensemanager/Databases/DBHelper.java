@@ -14,7 +14,7 @@ import com.danielkim.expensemanager.Models.ExpenseItem;
  */
 public class DBHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "expenses.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     private Context mContext;
 
     // Used to insert default values into table. Prevent recursive call to getDatabase()
@@ -37,12 +37,14 @@ public class DBHelper extends SQLiteOpenHelper {
         public static final String COL_CATEGORY = "category";
         public static final String COL_COLOUR = "colour";
         public static final String COL_DRAWABLE = "icon";
+        public static final String COL_VISIBLE = "is_visible";
     }
 
     public static abstract class PaymentMethodsTable implements BaseColumns{
         public static final String TABLE_PAYMENT_METHODS_NAME = "payment_methods";
         public static final String COL_PAYMENT_METHOD = "payment_method";
         public static final String COL_COLOUR = "colour";
+        public static final String COL_VISIBLE = "is_visible";
     }
 
     private static final String COMMA_SEP = ",";
@@ -62,13 +64,15 @@ public class DBHelper extends SQLiteOpenHelper {
                     CategoriesTable._ID + " INTEGER PRIMARY KEY " + COMMA_SEP +
                     CategoriesTable.COL_CATEGORY + " TEXT " + COMMA_SEP +
                     CategoriesTable.COL_COLOUR + " TEXT " + COMMA_SEP +
-                    CategoriesTable.COL_DRAWABLE + " TEXT " + ")";
+                    CategoriesTable.COL_DRAWABLE + " TEXT " + COMMA_SEP +
+                    CategoriesTable.COL_VISIBLE + " INTEGER " + ")";
 
     private static final String SQL_CREATE_PAYMENT_METHODS_TB =
             "CREATE TABLE " + PaymentMethodsTable.TABLE_PAYMENT_METHODS_NAME + " (" +
                     PaymentMethodsTable._ID + " INTEGER PRIMARY KEY " + COMMA_SEP +
                     PaymentMethodsTable.COL_PAYMENT_METHOD + " TEXT " + COMMA_SEP +
-                    PaymentMethodsTable.COL_COLOUR + " TEXT " + ")";
+                    PaymentMethodsTable.COL_COLOUR + " TEXT " + COMMA_SEP +
+                    PaymentMethodsTable.COL_VISIBLE + "INTEGER " + ")";
 
 
     public DBHelper(Context context) {
@@ -131,10 +135,21 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + ExpensesTable.TABLE_EXPENSES_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + PaymentMethodsTable.TABLE_PAYMENT_METHODS_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + CategoriesTable.TABLE_CATEGORIES_NAME);
-        onCreate(db);
+        // version 2: add bool "VISIBLE" field for 'deleted' categories/pms
+        if (newVersion > oldVersion) {
+            String updateCategoriesTable = "ALTER TABLE " +
+                    CategoriesTable.TABLE_CATEGORIES_NAME +
+                    " ADD COLUMN " +
+                    CategoriesTable.COL_VISIBLE + " INTEGER DEFAULT 1";
+
+            String updatePmTable = "ALTER TABLE " +
+                    PaymentMethodsTable.TABLE_PAYMENT_METHODS_NAME +
+                    " ADD COLUMN " +
+                    PaymentMethodsTable.COL_VISIBLE + " INTEGER DEFAULT 1";
+
+            db.execSQL(updateCategoriesTable);
+            db.execSQL(updatePmTable);
+        }
     }
 
     //insert new transaction into the Expenses table
@@ -187,6 +202,7 @@ public class DBHelper extends SQLiteOpenHelper {
         cv.put(CategoriesTable.COL_CATEGORY, category);
         cv.put(CategoriesTable.COL_COLOUR, colour);
         cv.put(CategoriesTable.COL_DRAWABLE, drawable);
+        cv.put(CategoriesTable.COL_VISIBLE, 1);
 
         long rowId = db.insert(CategoriesTable.TABLE_CATEGORIES_NAME, null, cv);
         return rowId;
@@ -197,6 +213,7 @@ public class DBHelper extends SQLiteOpenHelper {
         ContentValues cv = new ContentValues();
         cv.put(PaymentMethodsTable.COL_PAYMENT_METHOD, paymentMethod);
         cv.put(PaymentMethodsTable.COL_COLOUR, colour);
+        cv.put(PaymentMethodsTable.COL_VISIBLE, 1);
 
         long rowId = db.insert(PaymentMethodsTable.TABLE_PAYMENT_METHODS_NAME, null, cv);
         return rowId;
@@ -216,6 +233,16 @@ public class DBHelper extends SQLiteOpenHelper {
 
         Cursor c = db.rawQuery("SELECT * FROM " +
                 CategoriesTable.TABLE_CATEGORIES_NAME, null);
+
+        return c;
+    }
+
+    public Cursor getVisibleCategories() {
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor c = db.rawQuery("SELECT * FROM " +
+                CategoriesTable.TABLE_CATEGORIES_NAME + " WHERE "
+                + CategoriesTable.COL_VISIBLE + " = 1", null);
 
         return c;
     }
@@ -247,6 +274,16 @@ public class DBHelper extends SQLiteOpenHelper {
 
         Cursor c = db.rawQuery("SELECT * FROM " +
                 PaymentMethodsTable.TABLE_PAYMENT_METHODS_NAME, null);
+
+        return c;
+    }
+
+    public Cursor getVisiblePaymentMethods() {
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor c = db.rawQuery("SELECT * FROM " +
+                PaymentMethodsTable.TABLE_PAYMENT_METHODS_NAME + " WHERE "
+                + PaymentMethodsTable.COL_VISIBLE + " = 1", null);
 
         return c;
     }
