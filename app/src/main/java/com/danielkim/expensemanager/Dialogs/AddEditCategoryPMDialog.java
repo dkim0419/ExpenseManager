@@ -96,6 +96,10 @@ public class AddEditCategoryPMDialog extends android.support.v4.app.DialogFragme
             }
         });
 
+        if (mViewType == ViewCategoryPMActivity.ViewType.PaymentMethod) {
+            mCircle.setVisibility(View.GONE);
+        }
+
         builder.setPositiveButton(R.string.dialog_save, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {

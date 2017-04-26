@@ -85,7 +85,8 @@ public class ViewCategoryPMAdapter extends CursorRecyclerViewAdapter<ViewCategor
         } else {
             final ExpensePaymentMethod pm = ExpensePaymentMethod.fromCursor(c);
             viewHolder.mTitle.setText(pm.getName());
-            viewHolder.mCircle.setColorFilter(Color.parseColor(pm.getColour()));
+            viewHolder.mCircle.setColorFilter(R.color.gray);
+            viewHolder.mCircle.setImageResource(R.drawable.ic_card_black_24dp);
             // delete a category / pm
             viewHolder.mDeleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
