@@ -41,6 +41,9 @@ public class HistoryFragment extends Fragment implements INavDrawerFragment, Loa
                         "t2." + DBHelper.CategoriesTable.COL_COLOUR,
                         "t2." + DBHelper.CategoriesTable.COL_VISIBLE,
                         "t1." + DBHelper.ExpensesTable.COL_PAYMENT_METHOD_ID,
+                        "t3." + DBHelper.PaymentMethodsTable.COL_PAYMENT_METHOD,
+                        "t3." + DBHelper.PaymentMethodsTable.COL_COLOUR,
+                        "t3." + DBHelper.PaymentMethodsTable.COL_VISIBLE,
                         "t1." + DBHelper.ExpensesTable.COL_NOTES
                 };
     private static final String SORT_BY = "t1." + DBHelper.ExpensesTable.COL_DATE + " DESC";

@@ -78,7 +78,7 @@ public class HistoryAdapter extends CursorRecyclerViewAdapter<HistoryAdapter.Vie
         viewHolder.categoryTxt.setText(note.isEmpty() ? item.getCategory().getName() : note);
         viewHolder.amountTxt.setText(String.format(mContext.getResources().getString(R.string.dollar_amount), Utils.formatDoubleTwoDecimalPlaces(item.getAmount())));
         viewHolder.dateTxt.setText(MyDateUtils.formatDateMillis(mContext, item.getDateMillis()));
-        viewHolder.paymentMethodTxt.setText(item.getPaymentMethod());
+        viewHolder.paymentMethodTxt.setText(item.getPaymentMethod().getName());
         viewHolder.circle.setColorFilter(Color.parseColor(item.getCategory().getColour()));
         viewHolder.circleText.setText(viewHolder.categoryTxt.getText().subSequence(0, 1));
         viewHolder.layout.setOnClickListener(new View.OnClickListener() {
@@ -130,7 +130,7 @@ public class HistoryAdapter extends CursorRecyclerViewAdapter<HistoryAdapter.Vie
                         cv.put(DBHelper.ExpensesTable.COL_AMOUNT, item.getAmount());
                         cv.put(DBHelper.ExpensesTable.COL_DATE, item.getDateMillis());
                         cv.put(DBHelper.ExpensesTable.COL_CATEGORY_ID, item.getCategory().getId());
-                        cv.put(DBHelper.ExpensesTable.COL_PAYMENT_METHOD_ID, item.getPaymentMethod());
+                        cv.put(DBHelper.ExpensesTable.COL_PAYMENT_METHOD_ID, item.getPaymentMethod().getId());
                         cv.put(DBHelper.ExpensesTable.COL_NOTES, item.getNote());
                         mContext.getContentResolver().insert(DBContentProvider.CONTENT_URI, cv);
                     }

@@ -14,7 +14,7 @@ public class ExpenseItem implements Parcelable{
     private double amount; // amount of expense
     private long dateMillis; // date of expense in milliseconds since epoch time
     private ExpenseCategory category; // category of expense
-    private String paymentMethod; // payment method of expense
+    private ExpensePaymentMethod paymentMethod; // payment method of expense
     private String note; // custom note for the expense
 
     public ExpenseItem() {
@@ -25,7 +25,7 @@ public class ExpenseItem implements Parcelable{
         amount = in.readDouble();
         dateMillis = in.readLong();
         category = in.readParcelable(ExpenseCategory.class.getClassLoader());
-        paymentMethod = in.readString();
+        paymentMethod = in.readParcelable(ExpensePaymentMethod.class.getClassLoader());
         note = in.readString();
     }
 
@@ -40,7 +40,7 @@ public class ExpenseItem implements Parcelable{
         dest.writeDouble(amount);
         dest.writeLong(dateMillis);
         dest.writeParcelable(category, flags);
-        dest.writeString(paymentMethod);
+        dest.writeParcelable(paymentMethod, flags);
         dest.writeString(note);
     }
 
@@ -76,11 +76,11 @@ public class ExpenseItem implements Parcelable{
         this.category = category;
     }
 
-    public String getPaymentMethod() {
+    public ExpensePaymentMethod getPaymentMethod() {
         return paymentMethod;
     }
 
-    public void setPaymentMethod(String paymentMethod) {
+    public void setPaymentMethod(ExpensePaymentMethod paymentMethod) {
         this.paymentMethod = paymentMethod;
     }
 
@@ -109,7 +109,8 @@ public class ExpenseItem implements Parcelable{
         ExpenseCategory category = db.getCategoryFromId(c.getInt(c.getColumnIndex(DBHelper.ExpensesTable.COL_CATEGORY_ID)));
         item.setCategory(category);
         item.setNote(c.getString(c.getColumnIndex(DBHelper.ExpensesTable.COL_NOTES)));
-        item.setPaymentMethod(c.getString(c.getColumnIndex(DBHelper.ExpensesTable.COL_PAYMENT_METHOD_ID)));
+        ExpensePaymentMethod pm = db.getPaymentMethodFromId(c.getInt(c.getColumnIndex(DBHelper.ExpensesTable.COL_PAYMENT_METHOD_ID)));
+        item.setPaymentMethod(pm);
         item.setDateMillis(c.getLong(c.getColumnIndex(DBHelper.ExpensesTable.COL_DATE)));
         return item;
     }

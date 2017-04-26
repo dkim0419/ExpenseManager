@@ -77,6 +77,7 @@ public class OverviewFragment extends Fragment implements INavDrawerFragment, Lo
                         "t1." + DBHelper.ExpensesTable.COL_AMOUNT,
                         "t2." + DBHelper.CategoriesTable.COL_CATEGORY,
                         "t1." + DBHelper.ExpensesTable.COL_PAYMENT_METHOD_ID,
+                        "t3." + DBHelper.PaymentMethodsTable.COL_PAYMENT_METHOD,
                 };
 
     private static final String SELECTION = "strftime('" + MyDateUtils.MONTH_YEAR_FORMAT_SQL + "', t1." + DBHelper.ExpensesTable.COL_DATE + "/1000,'unixepoch','localtime') = ?";

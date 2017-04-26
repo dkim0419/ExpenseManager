@@ -79,7 +79,7 @@ public class ViewExpenseActivity extends AppCompatActivity {
         item = i;
         mDateTextView.setText(MyDateUtils.formatDateMillisLong(getApplicationContext(), item.getDateMillis()));
         mAmountTextView.setText(String.format(getResources().getString(R.string.dollar_amount), Utils.formatDoubleTwoDecimalPlaces(item.getAmount())));
-        mPaymentMethodTextView.setText(item.getPaymentMethod());
+        mPaymentMethodTextView.setText(item.getPaymentMethod().getName());
         mCategoryTextView.setText(item.getCategory().getName());
         mNoteTextView.setText(!TextUtils.isEmpty(item.getNote()) ? item.getNote() : getResources().getString(R.string.none));
 

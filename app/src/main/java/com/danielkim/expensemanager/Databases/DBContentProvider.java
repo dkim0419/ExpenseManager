@@ -68,7 +68,9 @@ public class DBContentProvider extends ContentProvider {
         queryBuilder.setTables(DBHelper.ExpensesTable.TABLE_EXPENSES_NAME);
 
         String joins = " t1 INNER JOIN " + DBHelper.CategoriesTable.TABLE_CATEGORIES_NAME +
-                " t2 ON t2._id = t1." + DBHelper.ExpensesTable.COL_CATEGORY_ID;
+                " t2 ON t2._id = t1." + DBHelper.ExpensesTable.COL_CATEGORY_ID +
+                " INNER JOIN " + DBHelper.PaymentMethodsTable.TABLE_PAYMENT_METHODS_NAME +
+                " t3 ON t3._id = t1." + DBHelper.ExpensesTable.COL_PAYMENT_METHOD_ID;
 
         String groupBy = null;
 

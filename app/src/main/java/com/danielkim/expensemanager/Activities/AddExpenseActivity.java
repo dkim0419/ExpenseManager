@@ -259,7 +259,7 @@ public class AddExpenseActivity extends AppCompatActivity
         onDateSet(null, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
         txtTime.setText(timeFormat12Hour.format(calendar.getTime()));
         setCategorySpinnerSelection(item.getCategory().getId());
-        setPaymentMethodSpinnerSelection(item.getPaymentMethod());
+        setPaymentMethodSpinnerSelection(item.getPaymentMethod().getId());
 
         txtNotes.addTextChangedListener(new TextWatcher() {
             @Override
@@ -485,9 +485,9 @@ public class AddExpenseActivity extends AppCompatActivity
 
         String notes = txtNotes.getText().toString();
         Cursor category = ((Cursor) spinnerCategory.getSelectedItem());
-        ExpenseCategory c = ExpenseCategory.fromCursor(category);
+        Cursor pm = ((Cursor) spinnerPaymentMethod.getSelectedItem());
         long categoryId = category.getInt(category.getColumnIndex(DBHelper.CategoriesTable._ID));
-        String paymentMethod = spinnerPaymentMethod.getSelectedItem().toString();
+        long paymentMethodId = pm.getInt(pm.getColumnIndex(DBHelper.PaymentMethodsTable._ID));
         // Store date as time since epoch
         long date = calendar.getTimeInMillis();
 
@@ -495,7 +495,7 @@ public class AddExpenseActivity extends AppCompatActivity
         cv.put(DBHelper.ExpensesTable.COL_AMOUNT, amount);
         cv.put(DBHelper.ExpensesTable.COL_DATE, date);
         cv.put(DBHelper.ExpensesTable.COL_CATEGORY_ID, categoryId);
-        cv.put(DBHelper.ExpensesTable.COL_PAYMENT_METHOD_ID, paymentMethod);
+        cv.put(DBHelper.ExpensesTable.COL_PAYMENT_METHOD_ID, paymentMethodId);
         cv.put(DBHelper.ExpensesTable.COL_NOTES, notes);
 
         return cv;
@@ -515,27 +515,24 @@ public class AddExpenseActivity extends AppCompatActivity
         Cursor categoriesCursor = db.getVisibleCategories();
         Cursor pmCursor = db.getVisiblePaymentMethods();
 
-        ArrayList<String> paymentMethods = new ArrayList<>();
-
-        for (pmCursor.moveToFirst(); !pmCursor.isAfterLast(); pmCursor.moveToNext()){
-            paymentMethods.add(pmCursor.getString(pmCursor.getColumnIndex(DBHelper.PaymentMethodsTable.COL_PAYMENT_METHOD)));
-        }
-
         SimpleCursorAdapter adapterCategories = new SimpleCursorAdapter
                 (this, android.R.layout.simple_dropdown_item_1line, categoriesCursor,
                         new String[] {DBHelper.CategoriesTable.COL_CATEGORY},
                         new int[] {android.R.id.text1}, 0);
         spinnerCategory.setAdapter(adapterCategories);
 
-        ArrayAdapter<String> adapterPaymentMethods = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, paymentMethods);
+        SimpleCursorAdapter adapterPaymentMethods = new SimpleCursorAdapter
+                (this, android.R.layout.simple_dropdown_item_1line, pmCursor,
+                        new String[] {DBHelper.PaymentMethodsTable.COL_PAYMENT_METHOD},
+                        new int[] {android.R.id.text1}, 0);
         spinnerPaymentMethod.setAdapter(adapterPaymentMethods);
-
-        pmCursor.close();
     }
 
-    private void setPaymentMethodSpinnerSelection(String s) {
-        for (int i = 0; i < spinnerPaymentMethod.getCount(); i++){
-            if (spinnerPaymentMethod.getItemAtPosition(i).equals(s)){
+    private void setPaymentMethodSpinnerSelection(int id) {
+        for (int i = 0; i < spinnerPaymentMethod.getCount(); i++) {
+            Cursor c = (Cursor) spinnerPaymentMethod.getItemAtPosition(i);
+            int itemId = c.getInt(c.getColumnIndex(DBHelper.PaymentMethodsTable._ID));
+            if (itemId == id) {
                 spinnerPaymentMethod.setSelection(i);
                 break;
             }

@@ -8,13 +8,14 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 import com.danielkim.expensemanager.Models.ExpenseCategory;
 import com.danielkim.expensemanager.Models.ExpenseItem;
+import com.danielkim.expensemanager.Models.ExpensePaymentMethod;
 
 /**
  * Created by Daniel on 2/5/2016.
  */
 public class DBHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "expenses.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
     private Context mContext;
 
     // Used to insert default values into table. Prevent recursive call to getDatabase()
@@ -53,9 +54,10 @@ public class DBHelper extends SQLiteOpenHelper {
                     ExpensesTable.COL_DATE + " INTEGER " + COMMA_SEP +
                     ExpensesTable.COL_AMOUNT + " DOUBLE " + COMMA_SEP +
                     ExpensesTable.COL_CATEGORY_ID + " INTEGER " + COMMA_SEP +
-                    ExpensesTable.COL_PAYMENT_METHOD_ID + " TEXT " + COMMA_SEP +
+                    ExpensesTable.COL_PAYMENT_METHOD_ID + " INTEGER " + COMMA_SEP +
                     ExpensesTable.COL_NOTES + " TEXT " + COMMA_SEP +
-                    "FOREIGN KEY(" + ExpensesTable.COL_CATEGORY_ID + ") REFERENCES " + CategoriesTable.TABLE_CATEGORIES_NAME + "(" +  CategoriesTable._ID + ")" +
+                    "FOREIGN KEY(" + ExpensesTable.COL_CATEGORY_ID + ") REFERENCES " + CategoriesTable.TABLE_CATEGORIES_NAME + "(" +  CategoriesTable._ID + ")" + COMMA_SEP +
+                    "FOREIGN KEY(" + ExpensesTable.COL_PAYMENT_METHOD_ID + ") REFERENCES " + PaymentMethodsTable.TABLE_PAYMENT_METHODS_NAME + "(" +  PaymentMethodsTable._ID + ")" +
                     ")";
 
     private static final String SQL_CREATE_CATEGORIES_TB =
@@ -71,7 +73,7 @@ public class DBHelper extends SQLiteOpenHelper {
                     PaymentMethodsTable._ID + " INTEGER PRIMARY KEY " + COMMA_SEP +
                     PaymentMethodsTable.COL_PAYMENT_METHOD + " TEXT " + COMMA_SEP +
                     PaymentMethodsTable.COL_COLOUR + " TEXT " + COMMA_SEP +
-                    PaymentMethodsTable.COL_VISIBLE + "INTEGER " + ")";
+                    PaymentMethodsTable.COL_VISIBLE + " INTEGER " + ")";
 
 
     public DBHelper(Context context) {
@@ -134,20 +136,11 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // version 2: add bool "VISIBLE" field for 'deleted' categories/pms
         if (newVersion > oldVersion) {
-            String updateCategoriesTable = "ALTER TABLE " +
-                    CategoriesTable.TABLE_CATEGORIES_NAME +
-                    " ADD COLUMN " +
-                    CategoriesTable.COL_VISIBLE + " INTEGER DEFAULT 1";
-
-            String updatePmTable = "ALTER TABLE " +
-                    PaymentMethodsTable.TABLE_PAYMENT_METHODS_NAME +
-                    " ADD COLUMN " +
-                    PaymentMethodsTable.COL_VISIBLE + " INTEGER DEFAULT 1";
-
-            db.execSQL(updateCategoriesTable);
-            db.execSQL(updatePmTable);
+            db.execSQL("DROP TABLE IF EXISTS " + ExpensesTable.TABLE_EXPENSES_NAME);
+            db.execSQL("DROP TABLE IF EXISTS " + PaymentMethodsTable.TABLE_PAYMENT_METHODS_NAME);
+            db.execSQL("DROP TABLE IF EXISTS " + CategoriesTable.TABLE_CATEGORIES_NAME);
+            onCreate(db);
         }
     }
 
@@ -257,6 +250,19 @@ public class DBHelper extends SQLiteOpenHelper {
         ExpenseCategory category = ExpenseCategory.fromCursor(c);
         c.close();
         return category;
+    }
+
+    public ExpensePaymentMethod getPaymentMethodFromId(int id){
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor c = db.rawQuery("SELECT * FROM "
+                + PaymentMethodsTable.TABLE_PAYMENT_METHODS_NAME + " WHERE " + PaymentMethodsTable._ID + "=" + id, null);
+
+        c.moveToFirst();
+
+        ExpensePaymentMethod pm = ExpensePaymentMethod.fromCursor(c);
+        c.close();
+        return pm;
     }
 
     public Cursor getCategoryColourFromName(String name){
