@@ -24,6 +24,7 @@ import com.danielkim.expensemanager.Databases.DBHelper;
 import com.danielkim.expensemanager.Dialogs.AddEditCategoryPMDialog;
 import com.danielkim.expensemanager.Models.ExpenseCategory;
 import com.danielkim.expensemanager.Models.ExpenseItem;
+import com.danielkim.expensemanager.Models.ExpensePaymentMethod;
 import com.danielkim.expensemanager.R;
 
 /**
@@ -73,7 +74,30 @@ public class ViewCategoryPMAdapter extends CursorRecyclerViewAdapter<ViewCategor
                 @Override
                 public void onClick(View v) {
                     // edit details
-                    AddEditCategoryPMDialog dialog = AddEditCategoryPMDialog.newInstance(category);
+                    AddEditCategoryPMDialog dialog = AddEditCategoryPMDialog.newInstance(category, null);
+                    FragmentTransaction transaction = ((ViewCategoryPMActivity) mContext)
+                            .getSupportFragmentManager()
+                            .beginTransaction();
+
+                    dialog.show(transaction, "add_edit_category_pm_dialog");
+                }
+            });
+        } else {
+            final ExpensePaymentMethod pm = ExpensePaymentMethod.fromCursor(c);
+            viewHolder.mTitle.setText(pm.getName());
+            viewHolder.mCircle.setColorFilter(Color.parseColor(pm.getColour()));
+            // delete a category / pm
+            viewHolder.mDeleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    deletePaymentMethod (pm, v, viewHolder.getAdapterPosition());
+                }
+            });
+            viewHolder.mLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // edit details
+                    AddEditCategoryPMDialog dialog = AddEditCategoryPMDialog.newInstance(null, pm);
                     FragmentTransaction transaction = ((ViewCategoryPMActivity) mContext)
                             .getSupportFragmentManager()
                             .beginTransaction();
@@ -107,6 +131,27 @@ public class ViewCategoryPMAdapter extends CursorRecyclerViewAdapter<ViewCategor
                     public void onClick(View v) {
                         // make category visible again
                         cv.put(DBHelper.CategoriesTable.COL_VISIBLE, 1); // re-enable visibility
+                        mContext.getContentResolver().update(uri, cv, null, null);
+                    }
+                }).show();
+    }
+
+    private void deletePaymentMethod(final ExpensePaymentMethod pm, View view, final int position){
+        final ContentValues cv = new ContentValues();
+        cv.put(DBHelper.PaymentMethodsTable._ID, pm.getId());
+        cv.put(DBHelper.PaymentMethodsTable.COL_COLOUR, pm.getColour());
+        cv.put(DBHelper.PaymentMethodsTable.COL_PAYMENT_METHOD, pm.getName());
+        cv.put(DBHelper.PaymentMethodsTable.COL_VISIBLE, 0); // hide visibility
+
+        final Uri uri = ContentUris.withAppendedId(DBContentProvider.CONTENT_URI_PAYMENT_METHODS, pm.getId());
+        mContext.getContentResolver().update(uri, cv, null, null);
+
+        Snackbar.make(view, mContext.getString(R.string.snackbar_pm_deleted, pm.getName()), Snackbar.LENGTH_LONG)
+                .setAction(mContext.getString(R.string.snackbar_undo), new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // make category visible again
+                        cv.put(DBHelper.PaymentMethodsTable.COL_VISIBLE, 1); // re-enable visibility
                         mContext.getContentResolver().update(uri, cv, null, null);
                     }
                 }).show();

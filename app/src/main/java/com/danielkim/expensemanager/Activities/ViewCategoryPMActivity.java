@@ -38,8 +38,16 @@ public class ViewCategoryPMActivity extends AppCompatActivity implements LoaderM
                     DBHelper.CategoriesTable.COL_COLOUR,
                     DBHelper.CategoriesTable.COL_VISIBLE,
             };
+    private static final String[] PROJECTION_PM =
+            new String[] {
+                    DBHelper.PaymentMethodsTable._ID,
+                    DBHelper.PaymentMethodsTable.COL_PAYMENT_METHOD,
+                    DBHelper.PaymentMethodsTable.COL_COLOUR,
+                    DBHelper.PaymentMethodsTable.COL_VISIBLE,
+            };
 
     private static final String SELECTION_CATEGORY = DBHelper.CategoriesTable.COL_VISIBLE + " = 1";
+    private static final String SELECTION_PM = DBHelper.PaymentMethodsTable.COL_VISIBLE + " = 1";
 
     private RecyclerView mRecyclerView;
     private ViewType mViewType;
@@ -71,7 +79,7 @@ public class ViewCategoryPMActivity extends AppCompatActivity implements LoaderM
         mRecyclerView.addItemDecoration(dividerItemDecoration);
         mRecyclerView.setLayoutManager(llm);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mAdapter = new ViewCategoryPMAdapter(this, null, ViewType.Category);
+        mAdapter = new ViewCategoryPMAdapter(this, null, mViewType);
         mRecyclerView.setAdapter(mAdapter);
         mCallbacks = this;
         getSupportLoaderManager().initLoader(LOADER_ID, null, mCallbacks);
@@ -98,7 +106,7 @@ public class ViewCategoryPMActivity extends AppCompatActivity implements LoaderM
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_add_new_category_pm) {
-            AddEditCategoryPMDialog dialog = AddEditCategoryPMDialog.newInstance(null);
+            AddEditCategoryPMDialog dialog = AddEditCategoryPMDialog.newInstance(null, null);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
             dialog.show(transaction, "add_edit_category_pm_dialog");
@@ -110,7 +118,11 @@ public class ViewCategoryPMActivity extends AppCompatActivity implements LoaderM
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(this, DBContentProvider.CONTENT_URI_CATEGORIES, PROJECTION_CATEGORY, SELECTION_CATEGORY, null, null);
+        if (mViewType == ViewType.Category) {
+            return new CursorLoader(this, DBContentProvider.CONTENT_URI_CATEGORIES, PROJECTION_CATEGORY, SELECTION_CATEGORY, null, null);
+        } else {
+            return new CursorLoader(this, DBContentProvider.CONTENT_URI_PAYMENT_METHODS, PROJECTION_PM, SELECTION_PM, null, null);
+        }
     }
 
     @Override

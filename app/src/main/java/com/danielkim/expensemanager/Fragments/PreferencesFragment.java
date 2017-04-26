@@ -32,5 +32,16 @@ public class PreferencesFragment extends PreferenceFragment {
                 return true;
             }
         });
+
+        Preference viewPaymentMethods = findPreference(getResources().getString(R.string.pref_add_payment_method_title));
+        viewPaymentMethods.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                Intent i = new Intent(getActivity(), ViewCategoryPMActivity.class);
+                i.putExtra(ViewCategoryPMActivity.VIEW_TYPE, ViewCategoryPMActivity.ViewType.PaymentMethod);
+                startActivity(i);
+                return true;
+            }
+        });
     }
 }

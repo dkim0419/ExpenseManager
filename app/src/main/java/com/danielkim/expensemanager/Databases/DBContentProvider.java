@@ -26,12 +26,16 @@ public class DBContentProvider extends ContentProvider {
     private static final int EXPENSES_NOTES = 7;
     private static final int EXPENSES_FILTER = 8;
 
-    private static final int CATEGORIES = 9;
-    private static final int CATEGORIES_ID = 10;
+    private static final int CATEGORIES = 100;
+    private static final int CATEGORIES_ID = 101;
+
+    private static final int PAYMENT_METHODS = 200;
+    private static final int PAYMENT_METHODS_ID = 201;
 
     private static final String AUTHORITY = "com.danielkim.expensemanager.Databases.DBContentProvider";
     private static final String BASE_PATH = "expenses";
     private static final String BASE_PATH_CATEGORIES = "categories";
+    private static final String BASE_PATH_PAYMENT_METHODS = "payment_methods";
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY
             + "/" + BASE_PATH);
 
@@ -39,6 +43,7 @@ public class DBContentProvider extends ContentProvider {
             + "/" + BASE_PATH + "/filter");
 
     public static final Uri CONTENT_URI_CATEGORIES = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH_CATEGORIES);
+    public static final Uri CONTENT_URI_PAYMENT_METHODS = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH_PAYMENT_METHODS);
 
     private static final UriMatcher sURIMatcher = new UriMatcher(
             UriMatcher.NO_MATCH);
@@ -54,6 +59,9 @@ public class DBContentProvider extends ContentProvider {
 
         sURIMatcher.addURI(AUTHORITY, BASE_PATH_CATEGORIES, CATEGORIES);
         sURIMatcher.addURI(AUTHORITY, BASE_PATH_CATEGORIES + "/#", CATEGORIES_ID);
+
+        sURIMatcher.addURI(AUTHORITY, BASE_PATH_PAYMENT_METHODS, PAYMENT_METHODS);
+        sURIMatcher.addURI(AUTHORITY, BASE_PATH_PAYMENT_METHODS + "/#", PAYMENT_METHODS_ID);
     }
 
     @Override
@@ -116,6 +124,9 @@ public class DBContentProvider extends ContentProvider {
             case CATEGORIES:
                 queryBuilder.setTables(DBHelper.CategoriesTable.TABLE_CATEGORIES_NAME);
                 break;
+            case PAYMENT_METHODS:
+                queryBuilder.setTables(DBHelper.PaymentMethodsTable.TABLE_PAYMENT_METHODS_NAME);
+                break;
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
         }
@@ -145,6 +156,9 @@ public class DBContentProvider extends ContentProvider {
                 break;
             case CATEGORIES:
                 id = sqlDB.insert(DBHelper.CategoriesTable.TABLE_CATEGORIES_NAME, null, contentValues);
+                break;
+            case PAYMENT_METHODS:
+                id = sqlDB.insert(DBHelper.PaymentMethodsTable.TABLE_PAYMENT_METHODS_NAME, null, contentValues);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
@@ -193,6 +207,25 @@ public class DBContentProvider extends ContentProvider {
                     rowsDeleted = sqlDB.delete(
                             DBHelper.CategoriesTable.TABLE_CATEGORIES_NAME,
                             DBHelper.CategoriesTable._ID + "=" + id
+                                    + " and " + selection,
+                            selectionArgs);
+                }
+                break;
+            case PAYMENT_METHODS:
+                rowsDeleted = sqlDB.delete(DBHelper.PaymentMethodsTable.TABLE_PAYMENT_METHODS_NAME, selection,
+                        selectionArgs);
+                break;
+            case PAYMENT_METHODS_ID:
+                id = uri.getLastPathSegment();
+                if (TextUtils.isEmpty(selection)) {
+                    rowsDeleted = sqlDB.delete(
+                            DBHelper.PaymentMethodsTable.TABLE_PAYMENT_METHODS_NAME,
+                            DBHelper.PaymentMethodsTable._ID + "=" + id,
+                            null);
+                } else {
+                    rowsDeleted = sqlDB.delete(
+                            DBHelper.PaymentMethodsTable.TABLE_PAYMENT_METHODS_NAME,
+                            DBHelper.PaymentMethodsTable._ID + "=" + id
                                     + " and " + selection,
                             selectionArgs);
                 }
@@ -250,6 +283,28 @@ public class DBContentProvider extends ContentProvider {
                     rowsUpdated = sqlDB.update(DBHelper.CategoriesTable.TABLE_CATEGORIES_NAME,
                             values,
                             DBHelper.ExpensesTable._ID + "=" + id
+                                    + " and "
+                                    + selection,
+                            selectionArgs);
+                }
+                break;
+            case PAYMENT_METHODS:
+                rowsUpdated = sqlDB.update(DBHelper.PaymentMethodsTable.TABLE_PAYMENT_METHODS_NAME,
+                        values,
+                        selection,
+                        selectionArgs);
+                break;
+            case PAYMENT_METHODS_ID:
+                id = uri.getLastPathSegment();
+                if (TextUtils.isEmpty(selection)) {
+                    rowsUpdated = sqlDB.update(DBHelper.PaymentMethodsTable.TABLE_PAYMENT_METHODS_NAME,
+                            values,
+                            DBHelper.PaymentMethodsTable._ID + "=" + id,
+                            null);
+                } else {
+                    rowsUpdated = sqlDB.update(DBHelper.PaymentMethodsTable.TABLE_PAYMENT_METHODS_NAME,
+                            values,
+                            DBHelper.PaymentMethodsTable._ID + "=" + id
                                     + " and "
                                     + selection,
                             selectionArgs);

@@ -5,5 +5,9 @@
         android:title="@string/pref_add_category_title"
         android:summary="@string/pref_add_category_desc">
     </PreferenceScreen>
-
+    <PreferenceScreen
+        android:key="@string/pref_add_payment_method_title"
+        android:title="@string/pref_add_payment_method_title"
+        android:summary="@string/pref_add_payment_method_desc">
+    </PreferenceScreen>
 </PreferenceScreen>

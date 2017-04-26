@@ -18,6 +18,7 @@ import com.danielkim.expensemanager.Activities.ViewCategoryPMActivity;
 import com.danielkim.expensemanager.Databases.DBContentProvider;
 import com.danielkim.expensemanager.Databases.DBHelper;
 import com.danielkim.expensemanager.Models.ExpenseCategory;
+import com.danielkim.expensemanager.Models.ExpensePaymentMethod;
 import com.danielkim.expensemanager.R;
 import com.danielkim.expensemanager.Utils.Utils;
 
@@ -31,7 +32,7 @@ import static com.danielkim.expensemanager.Activities.ViewCategoryPMActivity.VIE
 
 public class AddEditCategoryPMDialog extends android.support.v4.app.DialogFragment {
     private static final String EDIT_CATEGORY_KEY = "add_edit_dialog_edit_category";
-    private static final String EDIT_PM_KEY = "add_edit_dialog_edit_category";
+    private static final String EDIT_PM_KEY = "add_edit_dialog_edit_pm";
 
     private ImageView mCircle;
     private EditText mName;
@@ -42,11 +43,13 @@ public class AddEditCategoryPMDialog extends android.support.v4.app.DialogFragme
     private boolean isShowingColorPicker = false;
     private ViewCategoryPMActivity.ViewType mViewType;
     private ExpenseCategory mCategory;
+    private ExpensePaymentMethod mPaymentMethod;
 
-    public static AddEditCategoryPMDialog newInstance(ExpenseCategory category) {
+    public static AddEditCategoryPMDialog newInstance(ExpenseCategory category, ExpensePaymentMethod pm) {
         AddEditCategoryPMDialog dialog = new AddEditCategoryPMDialog();
         Bundle args = new Bundle();
         if (category != null) args.putParcelable(EDIT_CATEGORY_KEY, category);
+        else if (pm != null) args.putParcelable(EDIT_PM_KEY, pm);
         dialog.setArguments(args);
         return dialog;
     }
@@ -59,7 +62,8 @@ public class AddEditCategoryPMDialog extends android.support.v4.app.DialogFragme
         }
         Bundle bundle = this.getArguments();
         mCategory = bundle.getParcelable(EDIT_CATEGORY_KEY);
-        if (mCategory != null) {
+        mPaymentMethod = bundle.getParcelable(EDIT_PM_KEY);
+        if (mCategory != null || mPaymentMethod != null) {
             isInEditMode = true;
         }
     }
@@ -78,6 +82,9 @@ public class AddEditCategoryPMDialog extends android.support.v4.app.DialogFragme
         if (mCategory != null) {
             mChosenColor = Color.parseColor(mCategory.getColour());
             mName.setText(mCategory.getName());
+        } else if (mPaymentMethod != null) {
+            mChosenColor = Color.parseColor(mPaymentMethod.getColour());
+            mName.setText(mPaymentMethod.getName());
         }
 
         mCircle.setColorFilter(mChosenColor);
@@ -103,6 +110,16 @@ public class AddEditCategoryPMDialog extends android.support.v4.app.DialogFragme
                             getActivity().getContentResolver().update(uri, cv, null, null);
                         } else {
                             getActivity().getContentResolver().insert(DBContentProvider.CONTENT_URI_CATEGORIES, cv);
+                        }
+                    } else {
+                        cv.put(DBHelper.PaymentMethodsTable.COL_PAYMENT_METHOD, mName.getText().toString());
+                        cv.put(DBHelper.PaymentMethodsTable.COL_COLOUR, Utils.getColorHex(mChosenColor));
+                        cv.put(DBHelper.PaymentMethodsTable.COL_VISIBLE, 1);
+                        if (isInEditMode) {
+                            final Uri uri = ContentUris.withAppendedId(DBContentProvider.CONTENT_URI_PAYMENT_METHODS, mPaymentMethod.getId());
+                            getActivity().getContentResolver().update(uri, cv, null, null);
+                        } else {
+                            getActivity().getContentResolver().insert(DBContentProvider.CONTENT_URI_PAYMENT_METHODS, cv);
                         }
                     }
                 }
