@@ -10,4 +10,20 @@
         android:title="@string/pref_add_payment_method_title"
         android:summary="@string/pref_add_payment_method_desc">
     </PreferenceScreen>
+    <EditTextPreference
+        android:key="@string/pref_budget_title"
+        android:title="@string/pref_budget_title"
+        android:summary="@string/pref_budget_desc"
+        android:inputType="number">
+    </EditTextPreference>
+    <EditTextPreference
+        android:key="@string/pref_currency_title"
+        android:title="@string/pref_currency_title"
+        android:summary="@string/pref_currency_desc">
+    </EditTextPreference>
+    <EditTextPreference
+        android:key="@string/pref_about_title"
+        android:title="@string/pref_about_title"
+        android:summary="@string/pref_about_desc">
+    </EditTextPreference>
 </PreferenceScreen>

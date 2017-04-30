@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.danielkim.expensemanager.Activities.MainActivity;
 import com.danielkim.expensemanager.Fragments.HistoryFilterFragment;
 import com.danielkim.expensemanager.Fragments.HistoryFragment;
+import com.danielkim.expensemanager.MySharedPreferences;
 import com.danielkim.expensemanager.R;
 import com.danielkim.expensemanager.Utils.MyDateUtils;
 import com.danielkim.expensemanager.Utils.Utils;
@@ -58,7 +59,8 @@ public class HistoryFilterAdapter extends CursorRecyclerViewAdapter<HistoryFilte
         String amount = Utils.formatDoubleTwoDecimalPlaces(c.getDouble(HistoryFilterFragment.PROJECTION_SUM)); // amount
         int count = c.getInt(HistoryFilterFragment.PROJECTION_COUNT);
 
-        holder.mAmount.setText("$" + amount);
+        holder.mAmount.setText(mContext.getResources().getString(R.string.currency_amount,
+                MySharedPreferences.getCurrency(mContext), amount));
         holder.mDate.setText(monthYearFormatted);
         holder.mCount.setText(String.format(mContext.getResources().getString(R.string.total_transactions), count));
 

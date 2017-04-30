@@ -14,9 +14,5 @@
             android:id="@+id/nav_charts"
             android:icon="@drawable/ic_chart_black_24dp"
             android:title="@string/nav_charts" />
-        <item
-            android:id="@+id/nav_export"
-            android:icon="@drawable/ic_export_black_24dp"
-            android:title="@string/nav_export" />
     </group>
 </menu>

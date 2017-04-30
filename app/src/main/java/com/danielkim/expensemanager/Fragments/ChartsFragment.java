@@ -24,6 +24,7 @@ import com.danielkim.expensemanager.Activities.MainActivity;
 import com.danielkim.expensemanager.Databases.DBContentProvider;
 import com.danielkim.expensemanager.Databases.DBHelper;
 import com.danielkim.expensemanager.Models.ExpenseCategory;
+import com.danielkim.expensemanager.MySharedPreferences;
 import com.danielkim.expensemanager.R;
 import com.danielkim.expensemanager.Utils.MyDateUtils;
 import com.danielkim.expensemanager.Utils.Utils;
@@ -198,8 +199,10 @@ public class ChartsFragment extends Fragment implements INavDrawerFragment, Load
             centerDataColor = ContextCompat.getColor(getContext(), R.color.black);
         }
 
-        String amountText = String.format(category.toUpperCase() + "\n$%s",
-                Utils.formatDoubleTwoDecimalPlaces(amount));
+        String amountText = category.toUpperCase() + "\n" +
+                getResources().getString(R.string.currency_amount,
+                        ((MainActivity)getActivity()).getCurrency(),
+                        Utils.formatDoubleTwoDecimalPlaces(amount));
         int index = amountText.indexOf("\n");
         Spannable ss = new SpannableString(amountText);
         ss.setSpan(new RelativeSizeSpan(0.5f), 0, index, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);

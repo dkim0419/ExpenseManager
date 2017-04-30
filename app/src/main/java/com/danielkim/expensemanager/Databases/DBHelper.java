@@ -14,7 +14,7 @@ import com.danielkim.expensemanager.Models.ExpensePaymentMethod;
  * Created by Daniel on 2/5/2016.
  */
 public class DBHelper extends SQLiteOpenHelper {
-    private static final String DATABASE_NAME = "expenses.db";
+    public static final String DATABASE_NAME = "expenses.db";
     private static final int DATABASE_VERSION = 3;
     private Context mContext;
 

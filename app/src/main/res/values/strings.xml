@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ExpenseManager</string>
+    <string name="app_name">Expenser</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -17,7 +17,7 @@
 
     <!-- Common -->
     <string name="currency">$</string>
-    <string name="dollar_amount">$%s</string>
+    <string name="currency_amount">%1$s%2$s</string>
     <string name="snackbar_undo">UNDO</string>
     <string name="dialog_save">Save</string>
     <string name="dialog_cancel">Cancel</string>
@@ -80,11 +80,20 @@
     <string name="dialog_edit_pm_title">Edit Payment Method</string>
 
     <!-- Preferences -->
-    <string name="pref_budget_key">Set Budget</string>
+    <string name="pref_budget_title">Budget</string>
+    <string name="pref_budget_desc">Your current monthly budget is %1$s%2$s</string>
+    <string name="pref_currency_title">Currency</string>
+    <string name="pref_currency_desc">You current currency is \'%s\'</string>
     <string name="pref_add_category_title">Categories</string>
     <string name="pref_add_category_desc">Add and edit your expense categories</string>
     <string name="pref_add_payment_method_title">Payment Methods</string>
     <string name="pref_add_payment_method_desc">Add and edit your payment methods</string>
-    <string name="pref_about_key">About</string>
+    <string name="pref_about_title">About</string>
+    <string name="pref_about_desc">v%s</string>
     <string name="pref_dialog_positive_ok">OK</string>
+
+    <!-- Nav Greetings -->
+    <string name="good_morning">Good morning!</string>
+    <string name="good_afternoon">Good afternoon!</string>
+    <string name="good_evening">Good evening!</string>
 </resources>

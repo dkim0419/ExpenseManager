@@ -1,6 +1,10 @@
 package com.danielkim.expensemanager.Activities;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -18,9 +22,11 @@ import com.danielkim.expensemanager.Fragments.ChartsFragment;
 import com.danielkim.expensemanager.Fragments.HistoryFragment;
 import com.danielkim.expensemanager.Fragments.INavDrawerFragment;
 import com.danielkim.expensemanager.Fragments.OverviewFragment;
+import com.danielkim.expensemanager.MySharedPreferences;
 import com.danielkim.expensemanager.R;
 
 import java.util.Calendar;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -29,12 +35,19 @@ public class MainActivity extends AppCompatActivity
     private DrawerLayout drawer;
     private NavigationView navigationView;
 
+    // currency and budget
+    private String mCurrency;
+    private String mBudget;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        mCurrency = MySharedPreferences.getCurrency(this);
+        mBudget = MySharedPreferences.getBudget(this);
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -85,6 +98,30 @@ public class MainActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         updateNavDrawerSelection();
+        String currency = MySharedPreferences.getCurrency(this);
+        String budget = MySharedPreferences.getBudget(this);
+
+        if ((mCurrency == null || !mCurrency.equals(currency)) ||
+                (mBudget == null || !mBudget.equals(budget))) {
+            mCurrency = currency;
+            mBudget = budget;
+
+            Intent mStartActivity = new Intent(MainActivity.this, MainActivity.class);
+            int mPendingIntentId = 123456;
+            PendingIntent mPendingIntent = PendingIntent.getActivity(MainActivity.this, mPendingIntentId, mStartActivity,
+                    PendingIntent.FLAG_CANCEL_CURRENT);
+            AlarmManager mgr = (AlarmManager) MainActivity.this.getSystemService(Context.ALARM_SERVICE);
+            mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
+            System.exit(0);
+        }
+    }
+
+    public String getBudget() {
+        return mBudget;
+    }
+
+    public String getCurrency() {
+        return mCurrency;
     }
 
     @Override
@@ -139,8 +176,6 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.nav_charts:
                 fragment = ChartsFragment.newInstance(Calendar.getInstance());
-                break;
-            case R.id.nav_export:
                 break;
         }
 

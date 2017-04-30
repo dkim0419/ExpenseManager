@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.danielkim.expensemanager.Databases.DBHelper;
 import com.danielkim.expensemanager.Models.ExpenseItem;
 import com.danielkim.expensemanager.R;
+import com.danielkim.expensemanager.MySharedPreferences;
 import com.danielkim.expensemanager.Utils.MyDateUtils;
 import com.danielkim.expensemanager.Utils.Utils;
 
@@ -78,7 +79,7 @@ public class ViewExpenseActivity extends AppCompatActivity {
         if (i == null) return;
         item = i;
         mDateTextView.setText(MyDateUtils.formatDateMillisLong(getApplicationContext(), item.getDateMillis()));
-        mAmountTextView.setText(String.format(getResources().getString(R.string.dollar_amount), Utils.formatDoubleTwoDecimalPlaces(item.getAmount())));
+        mAmountTextView.setText(String.format(getResources().getString(R.string.currency_amount), MySharedPreferences.getCurrency(this), Utils.formatDoubleTwoDecimalPlaces(item.getAmount())));
         mPaymentMethodTextView.setText(item.getPaymentMethod().getName());
         mCategoryTextView.setText(item.getCategory().getName());
         mNoteTextView.setText(!TextUtils.isEmpty(item.getNote()) ? item.getNote() : getResources().getString(R.string.none));

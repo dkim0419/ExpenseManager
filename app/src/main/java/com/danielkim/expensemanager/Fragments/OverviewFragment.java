@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.text.Spannable;
@@ -18,8 +17,6 @@ import android.text.style.RelativeSizeSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.danielkim.expensemanager.Activities.AddExpenseActivity;
@@ -28,28 +25,20 @@ import com.danielkim.expensemanager.Adapters.OverviewAdapter;
 import com.danielkim.expensemanager.Databases.DBContentProvider;
 import com.danielkim.expensemanager.Databases.DBHelper;
 import com.danielkim.expensemanager.Models.ExpenseCategory;
+import com.danielkim.expensemanager.MySharedPreferences;
 import com.danielkim.expensemanager.R;
 import com.danielkim.expensemanager.Utils.MyDateUtils;
 import com.danielkim.expensemanager.Utils.Utils;
 import com.github.mikephil.charting.animation.Easing;
-import com.github.mikephil.charting.charts.HorizontalBarChart;
 import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
-import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
-import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.lb.auto_fit_textview.AutoResizeTextView;
 
 import java.util.ArrayList;
@@ -85,12 +74,10 @@ public class OverviewFragment extends Fragment implements INavDrawerFragment, Lo
 
     private static final int LOADER_ID = 0;
 
-   // private HorizontalBarChart mBarChart;
     private PieChart mPieChart;
     private Map<ExpenseCategory, Float> expensesByCategory;
     private HashMap<String, ExpenseCategory> mapCategoryNameToCategory;
     private List<Integer> colors;
-    //private List<String> labels;
     private DBHelper db;
     private double totalAmount = 0;
 
@@ -105,7 +92,6 @@ public class OverviewFragment extends Fragment implements INavDrawerFragment, Lo
         expensesByCategory = new HashMap<>();
         mapCategoryNameToCategory = new HashMap<>();
         colors = new ArrayList<>();
-        //labels = new ArrayList<>();
     }
 
     @Override
@@ -133,24 +119,6 @@ public class OverviewFragment extends Fragment implements INavDrawerFragment, Lo
                 }
             });
         }
-
-        /*
-        mBarChart = new HorizontalBarChart(getContext());
-        mBarChart.getLegend().setEnabled(false);
-        mBarChart.setDescription(null);
-        mBarChart.getXAxis().setDrawLabels(true);
-        mBarChart.getAxisLeft().setDrawLabels(false);
-        mBarChart.getAxisRight().setDrawLabels(false);
-        mBarChart.getAxisLeft().setDrawGridLines(false);
-        mBarChart.getAxisRight().setDrawGridLines(false);
-        mBarChart.getXAxis().setDrawGridLines(false);
-        mBarChart.setDrawGridBackground(false);
-        mBarChart.getXAxis().setDrawAxisLine(false);
-        mBarChart.getAxisRight().setDrawAxisLine(false);
-        mBarChart.getAxisLeft().setDrawAxisLine(false);
-        //mBarChart.setScaleEnabled(false);
-        overviewLayout.addView(mBarChart);
-        */
 
         mPieChart = new PieChart(getContext());
         mPieChart.setNoDataText(getResources().getString(R.string.chart_no_data));
@@ -211,72 +179,6 @@ public class OverviewFragment extends Fragment implements INavDrawerFragment, Lo
         }
     }
 
-    /*
-    private void updateChartData(Cursor c){
-        resetExpensesAndCheckForNewCategories();
-        for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()){
-            String categoryName = c.getString(c.getColumnIndex(DBHelper.CategoriesTable.COL_CATEGORY));
-            double amount = c.getDouble(c.getColumnIndex(DBHelper.ExpensesTable.COL_AMOUNT));
-            ExpenseCategory curCategory = mapCategoryNameToCategory.get(categoryName);
-            expensesByCategory.put(curCategory, expensesByCategory.get(curCategory) + (float)amount);
-        }
-
-        List<BarEntry> entries = new ArrayList<>();
-        if (labels != null) labels.clear();
-        if (colors != null) colors.clear();
-        totalAmount = 0;
-        int i = 0;
-        expensesByCategory = Utils.sortByValue(expensesByCategory);
-        for (Map.Entry expense : expensesByCategory.entrySet()) {
-            // turn your data into Entry objects
-            float amount = (Float) expense.getValue();
-            if (amount > 0) {
-                ExpenseCategory category = (ExpenseCategory)expense.getKey();
-                entries.add(new BarEntry(i, new float[] {amount}, category.getName()));
-                labels.add(category.getName());
-                colors.add(Color.parseColor(category.getColour()));
-                totalAmount += amount;
-            }
-            i++;
-        }
-
-        if (entries.size() > 0){
-            BarDataSet dataSet = new BarDataSet(entries, null);
-            dataSet.setHighLightAlpha(0);
-            dataSet.setColors(colors);
-
-            dataSet.setValueFormatter(new IValueFormatter() {
-                @Override
-                public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
-                    return "";
-                    return String.format(
-                            getResources().getString(R.string.dollar_amount),
-                            Utils.formatDoubleTwoDecimalPlaces(value));
-                }
-            });
-
-            BarData data = new BarData(dataSet);
-            IAxisValueFormatter formatter = new IAxisValueFormatter() {
-                @Override
-                public String getFormattedValue(float value, AxisBase axis) {
-                    if (value < 0 || value >= labels.size()) {
-                        return "";
-                    }
-                    return labels.get((int) value);
-                }
-            };
-            mBarChart.getXAxis().setValueFormatter(formatter);
-            mBarChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-
-            data.setValueTextColor(Color.BLACK);
-            data.setValueTextSize(10);
-            mBarChart.setData(data);
-            mBarChart.animateY(1000, Easing.EasingOption.EaseInOutQuad);
-        } else {
-            mBarChart.clear();
-        }
-    }*/
-
     private void updateChartData(Cursor c){
         resetExpensesAndCheckForNewCategories();
         for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()){
@@ -325,15 +227,24 @@ public class OverviewFragment extends Fragment implements INavDrawerFragment, Lo
             centerDataColor = colors.get(colorIndex);
             mPieChart.setCenterTextSize(25);
         } else {
-            // TODO: Emoji changes based on user's set monthly budget
-            mPieChart.setCenterText("☺");
+            Long budget = Long.parseLong(((MainActivity)getActivity()).getBudget());
+            double usedBudgetPercentage = totalAmount / budget;
+            if (usedBudgetPercentage > 1) {
+                mPieChart.setCenterText(new String(Character.toChars(0x1F621)));
+            } else if (usedBudgetPercentage >= 0.9) {
+                mPieChart.setCenterText(new String(Character.toChars(0x1F613)));
+            } else {
+                mPieChart.setCenterText(new String(Character.toChars(0x1F603)));
+            }
             mPieChart.setCenterTextSize(50);
             mPieChart.setCenterTextColor(Color.BLACK);
             return;
         }
 
-        String amountText = String.format(category.toUpperCase() + "\n$%s",
-                Utils.formatDoubleTwoDecimalPlaces(amount));
+        String amountText = category.toUpperCase() + "\n" +
+                getResources().getString(R.string.currency_amount,
+                        ((MainActivity)getActivity()).getCurrency(),
+                        Utils.formatDoubleTwoDecimalPlaces(amount));
         int index = amountText.indexOf("\n");
         Spannable ss = new SpannableString(amountText);
         ss.setSpan(new RelativeSizeSpan(0.5f), 0, index, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -362,11 +273,13 @@ public class OverviewFragment extends Fragment implements INavDrawerFragment, Lo
                 currentExpenses.setSpan(new RelativeSizeSpan(0.5f), 0, 1, 0);
                 txtCurrentMonthExpenses.setText(currentExpenses);*/
                 updateChartData(cursor);
+                String currency = ((MainActivity)getActivity()).getCurrency();
                 SpannableString currentExpenses =
                         new SpannableString(
-                                String.format(getResources().getString(R.string.dollar_amount),
+                                String.format(getResources().getString(R.string.currency_amount),
+                                        currency,
                                         Utils.formatDoubleTwoDecimalPlaces((totalAmount))));
-                currentExpenses.setSpan(new RelativeSizeSpan(0.5f), 0, 1, 0);
+                currentExpenses.setSpan(new RelativeSizeSpan(0.5f), 0, currency.length(), 0);
                 txtCurrentMonthExpenses.setText(currentExpenses);
                 break;
             default:

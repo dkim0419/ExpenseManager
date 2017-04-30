@@ -1,6 +1,5 @@
 package com.danielkim.expensemanager.Activities;
 
-import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
@@ -18,8 +17,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.ColorUtils;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -35,7 +32,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -45,8 +41,8 @@ import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.danielkim.expensemanager.Models.ExpenseCategory;
 import com.danielkim.expensemanager.Models.ExpenseItem;
+import com.danielkim.expensemanager.MySharedPreferences;
 import com.danielkim.expensemanager.Utils.CustomAnimation;
 import com.danielkim.expensemanager.Databases.DBContentProvider;
 import com.danielkim.expensemanager.Databases.DBHelper;
@@ -55,11 +51,7 @@ import com.danielkim.expensemanager.Utils.Utils;
 import com.lb.auto_fit_textview.AutoResizeTextView;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -440,16 +432,17 @@ public class AddExpenseActivity extends AppCompatActivity
     }
 
     private void setExpenseInputText(String text){
+        String currency = MySharedPreferences.getCurrency(this);
         SpannableString currentExpenses =
-                new SpannableString(String.format(getResources().getString(R.string.dollar_amount), text));
-        currentExpenses.setSpan(new RelativeSizeSpan(0.5f), 0, 1, 0);
+                new SpannableString(String.format(getResources().getString(R.string.currency_amount), currency, text));
+        currentExpenses.setSpan(new RelativeSizeSpan(0.5f), 0, currency.length(), 0);
         txtExpenseInput.setText(currentExpenses);
         onFieldEdited();
     }
 
     private double getExpenseInputAmount(){
         String text = txtExpenseInput.getText().toString();
-        return Double.parseDouble(text.substring(1));
+        return Double.parseDouble(text.substring(MySharedPreferences.getCurrency(this).length()));
     }
 
     // Open CalendarView to choose date
