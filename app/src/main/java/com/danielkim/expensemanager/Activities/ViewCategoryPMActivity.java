@@ -1,9 +1,7 @@
 package com.danielkim.expensemanager.Activities;
 
-import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;

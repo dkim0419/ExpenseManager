@@ -12,7 +12,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -23,7 +22,6 @@ import com.danielkim.expensemanager.Databases.DBContentProvider;
 import com.danielkim.expensemanager.Databases.DBHelper;
 import com.danielkim.expensemanager.Dialogs.AddEditCategoryPMDialog;
 import com.danielkim.expensemanager.Models.ExpenseCategory;
-import com.danielkim.expensemanager.Models.ExpenseItem;
 import com.danielkim.expensemanager.Models.ExpensePaymentMethod;
 import com.danielkim.expensemanager.R;
 

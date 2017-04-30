@@ -1,10 +1,6 @@
 package com.danielkim.expensemanager.Activities;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.PersistableBundle;
-import android.preference.Preference;
-import android.preference.PreferenceActivity;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;

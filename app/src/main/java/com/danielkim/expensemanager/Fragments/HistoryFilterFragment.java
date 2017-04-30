@@ -19,7 +19,6 @@ import com.danielkim.expensemanager.Databases.DBContentProvider;
 import com.danielkim.expensemanager.Databases.DBHelper;
 import com.danielkim.expensemanager.R;
 import com.danielkim.expensemanager.Utils.MyDateUtils;
-import com.danielkim.expensemanager.Utils.Utils;
 
 /**
  * Created by Daniel on 11/7/2016.

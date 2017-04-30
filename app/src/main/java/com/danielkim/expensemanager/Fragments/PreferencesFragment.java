@@ -7,9 +7,13 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
+import android.view.View;
 
 import com.danielkim.expensemanager.Activities.ViewCategoryPMActivity;
+import com.danielkim.expensemanager.BuildConfig;
 import com.danielkim.expensemanager.R;
 import com.danielkim.expensemanager.MySharedPreferences;
 
@@ -22,6 +26,7 @@ public class PreferencesFragment extends PreferenceFragment {
     private PreferenceScreen mViewPaymentMethodsPref;
     private EditTextPreference mSetBudgetPref;
     private EditTextPreference mSetCurrencyPref;
+    private Preference mAboutPref;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -77,6 +82,23 @@ public class PreferencesFragment extends PreferenceFragment {
                     mSetCurrencyPref.setSummary(getResources().getString(R.string.pref_currency_desc, MySharedPreferences.getCurrency(getActivity())));
                     mSetBudgetPref.setSummary(getResources().getString(R.string.pref_budget_desc, MySharedPreferences.getCurrency(getActivity()), MySharedPreferences.getBudget(getActivity())));
                 }
+                return true;
+            }
+        });
+
+        mAboutPref = findPreference(getResources().getString(R.string.pref_about_title));
+        mAboutPref.setSummary(getString(R.string.pref_about_desc, BuildConfig.VERSION_NAME));
+        mAboutPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                LayoutInflater dialogInflater = getActivity().getLayoutInflater();
+                View openSourceLicensesView = dialogInflater.inflate(R.layout.fragment_about, null);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setView(openSourceLicensesView)
+                        .setTitle((getString(R.string.pref_about_title)))
+                        .setNeutralButton(android.R.string.ok, null)
+                        .show();
                 return true;
             }
         });

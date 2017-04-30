@@ -60,6 +60,14 @@
                 android:id="@+id/overviewBody"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
+            <com.github.mikephil.charting.charts.PieChart
+                android:id="@+id/pie_chart"
+                android:layout_gravity="center"
+                android:layout_margin="30dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            </com.github.mikephil.charting.charts.PieChart>
         </FrameLayout>
     </LinearLayout>
 </android.support.design.widget.CoordinatorLayout>

@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
-import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -23,8 +22,6 @@ import com.danielkim.expensemanager.R;
 import com.danielkim.expensemanager.Utils.Utils;
 
 import petrov.kristiyan.colorpicker.ColorPicker;
-
-import static com.danielkim.expensemanager.Activities.ViewCategoryPMActivity.VIEW_TYPE;
 
 /**
  * Created by Daniel on 4/24/2017.

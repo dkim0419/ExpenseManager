@@ -21,9 +21,9 @@
         android:title="@string/pref_currency_title"
         android:summary="@string/pref_currency_desc">
     </EditTextPreference>
-    <EditTextPreference
+    <Preference
         android:key="@string/pref_about_title"
         android:title="@string/pref_about_title"
         android:summary="@string/pref_about_desc">
-    </EditTextPreference>
+    </Preference>
 </PreferenceScreen>

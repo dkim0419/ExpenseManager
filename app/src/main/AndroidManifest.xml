@@ -9,7 +9,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".Activities.MainActivity"
+            android:name="com.danielkim.expensemanager.Activities.MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar">
@@ -19,41 +19,41 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Activities.AddExpenseActivity"
+            android:name="com.danielkim.expensemanager.Activities.AddExpenseActivity"
             android:label="@string/app_name"
             android:windowSoftInputMode="stateHidden"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
-            android:name=".Activities.MyPreferenceActivity"
+            android:name="com.danielkim.expensemanager.Activities.MyPreferenceActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme"
-            android:parentActivityName=".Activities.MainActivity">
+            android:parentActivityName="com.danielkim.expensemanager.Activities.MainActivity">
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".Activities.MainActivity" />
+                android:value="com.danielkim.expensemanager.Activities.MainActivity" />
         </activity>
         <activity
-            android:name=".Activities.ViewExpenseActivity"
+            android:name="com.danielkim.expensemanager.Activities.ViewExpenseActivity"
             android:label="@string/app_name"
-            android:parentActivityName=".Activities.MainActivity">
+            android:parentActivityName="com.danielkim.expensemanager.Activities.MainActivity">
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".Activities.MainActivity" />
+                android:value="com.danielkim.expensemanager.Activities.MainActivity" />
         </activity>
         <activity
-            android:name=".Activities.ViewCategoryPMActivity"
+            android:name="com.danielkim.expensemanager.Activities.ViewCategoryPMActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme"
-            android:parentActivityName=".Activities.MyPreferenceActivity">
+            android:parentActivityName="com.danielkim.expensemanager.Activities.MyPreferenceActivity">
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".Activities.MyPreferenceActivity" />
+                android:value="com.danielkim.expensemanager.Activities.MyPreferenceActivity" />
         </activity>
-        <provider android:name=".Databases.DBContentProvider"
+        <provider android:name="com.danielkim.expensemanager.Databases.DBContentProvider"
                   android:authorities="com.danielkim.expensemanager.Databases.DBContentProvider" />
     </application>
 

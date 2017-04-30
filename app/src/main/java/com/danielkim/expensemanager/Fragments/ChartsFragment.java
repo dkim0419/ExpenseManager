@@ -16,7 +16,6 @@ import android.text.style.RelativeSizeSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -24,7 +23,6 @@ import com.danielkim.expensemanager.Activities.MainActivity;
 import com.danielkim.expensemanager.Databases.DBContentProvider;
 import com.danielkim.expensemanager.Databases.DBHelper;
 import com.danielkim.expensemanager.Models.ExpenseCategory;
-import com.danielkim.expensemanager.MySharedPreferences;
 import com.danielkim.expensemanager.R;
 import com.danielkim.expensemanager.Utils.MyDateUtils;
 import com.danielkim.expensemanager.Utils.Utils;
@@ -115,8 +113,7 @@ public class ChartsFragment extends Fragment implements INavDrawerFragment, Load
         View v = inflater.inflate(R.layout.fragment_charts, container, false);
         mCallbacks = this;
 
-        FrameLayout layout = (FrameLayout) v.findViewById(R.id.charts_container);
-        mPieChart = new PieChart(getContext());
+        mPieChart = (PieChart) v.findViewById(R.id.pie_chart);
         mPieChart.setNoDataText(getResources().getString(R.string.chart_no_data));
         mPieChart.setNoDataTextColor(Color.DKGRAY);
         mPieChart.setRotationEnabled(false);
@@ -125,7 +122,6 @@ public class ChartsFragment extends Fragment implements INavDrawerFragment, Load
         mPieChart.setEntryLabelColor(Color.WHITE);
         mPieChart.setUsePercentValues(true);
         mPieChart.setDrawEntryLabels(false);
-        mPieChart.setExtraOffsets(20, 10, 20, 10);
         mPieChart.setCenterTextSize(25);
         mPieChart.getLegend().setWordWrapEnabled(true);
         mPieChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
@@ -140,7 +136,6 @@ public class ChartsFragment extends Fragment implements INavDrawerFragment, Load
             }
         });
         mPieChart.getLegend().setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
-        layout.addView(mPieChart);
 
         mDate = (TextView) v.findViewById(R.id.txt_charts_date);
         mDate.setOnClickListener(new View.OnClickListener() {

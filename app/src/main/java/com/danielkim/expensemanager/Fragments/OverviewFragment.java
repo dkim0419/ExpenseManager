@@ -25,13 +25,11 @@ import com.danielkim.expensemanager.Adapters.OverviewAdapter;
 import com.danielkim.expensemanager.Databases.DBContentProvider;
 import com.danielkim.expensemanager.Databases.DBHelper;
 import com.danielkim.expensemanager.Models.ExpenseCategory;
-import com.danielkim.expensemanager.MySharedPreferences;
 import com.danielkim.expensemanager.R;
 import com.danielkim.expensemanager.Utils.MyDateUtils;
 import com.danielkim.expensemanager.Utils.Utils;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
@@ -120,7 +118,7 @@ public class OverviewFragment extends Fragment implements INavDrawerFragment, Lo
             });
         }
 
-        mPieChart = new PieChart(getContext());
+        mPieChart = (PieChart) v.findViewById(R.id.pie_chart);
         mPieChart.setNoDataText(getResources().getString(R.string.chart_no_data));
         mPieChart.setNoDataTextColor(Color.DKGRAY);
         mPieChart.setRotationEnabled(false);
@@ -130,7 +128,6 @@ public class OverviewFragment extends Fragment implements INavDrawerFragment, Lo
         mPieChart.setEntryLabelColor(Color.WHITE);
         mPieChart.setUsePercentValues(true);
         mPieChart.setDrawEntryLabels(false);
-        mPieChart.setExtraOffsets(20, 10, 20, 10);
         mPieChart.setCenterTextSize(25);
         mPieChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
@@ -143,8 +140,6 @@ public class OverviewFragment extends Fragment implements INavDrawerFragment, Lo
                 setPieChartCenterText(totalAmount, getResources().getString(R.string.chart_total), -1);
             }
         });
-        mPieChart.getLegend().setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
-        overviewLayout.addView(mPieChart);
 
         mCallbacks = this;
         getLoaderManager().initLoader(LOADER_ID, null, mCallbacks);

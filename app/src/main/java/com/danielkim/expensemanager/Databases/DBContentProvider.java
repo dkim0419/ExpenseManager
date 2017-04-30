@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.text.TextUtils;
 
 import com.danielkim.expensemanager.Utils.MyDateUtils;
-import com.danielkim.expensemanager.Utils.Utils;
 
 /**
  * Created by Daniel on 7/16/2016.

@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Expenser</string>
+    <string name="app_about">Developed by Daniel Yehun Kim\nwww.danielkim.xyz</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

@@ -7,9 +7,6 @@ import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.LinearLayout;
 
-import java.util.concurrent.Callable;
-import java.util.function.Function;
-
 public final class CustomAnimation {
     // http://stackoverflow.com/questions/4946295/android-expand-collapse-animation/13381228#13381228
     public static void expand(final View v) {

@@ -4,14 +4,10 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -26,14 +22,12 @@ import com.danielkim.expensemanager.MySharedPreferences;
 import com.danielkim.expensemanager.R;
 
 import java.util.Calendar;
-import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements BottomNavigationView.OnNavigationItemSelectedListener {
 
     private DBHelper database;
-    private DrawerLayout drawer;
-    private NavigationView navigationView;
+    private BottomNavigationView navigationView;
 
     // currency and budget
     private String mCurrency;
@@ -49,14 +43,8 @@ public class MainActivity extends AppCompatActivity
         mCurrency = MySharedPreferences.getCurrency(this);
         mBudget = MySharedPreferences.getBudget(this);
 
-        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        navigationView = (BottomNavigationView) findViewById(R.id.nav_view);
+        navigationView.setOnNavigationItemSelectedListener(this);
 
         database = new DBHelper(this);
 
@@ -66,7 +54,7 @@ public class MainActivity extends AppCompatActivity
                 .replace(R.id.container, fragment)
                 .commit();
         setActionBarTitle(getResources().getString(R.string.nav_overview));
-        navigationView.setCheckedItem(R.id.nav_overview);
+        navigationView.performClick();
 
         getSupportFragmentManager().addOnBackStackChangedListener(
                 new FragmentManager.OnBackStackChangedListener() {
@@ -81,17 +69,13 @@ public class MainActivity extends AppCompatActivity
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container);
         if (fragment instanceof INavDrawerFragment){
             // set nav drawer selection to current active fragment
-            navigationView.setCheckedItem(((INavDrawerFragment) fragment).getNavDrawerId());
+            navigationView.performClick();
         }
     }
 
     @Override
     public void onBackPressed() {
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
+        super.onBackPressed();
     }
 
     @Override
@@ -189,8 +173,5 @@ public class MainActivity extends AppCompatActivity
 
         // set the toolbar title
         setActionBarTitle(title);
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
     }
 }
