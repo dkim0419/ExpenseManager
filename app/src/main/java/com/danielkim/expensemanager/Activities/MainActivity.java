@@ -16,7 +16,7 @@ import android.view.MenuItem;
 import com.danielkim.expensemanager.Databases.DBHelper;
 import com.danielkim.expensemanager.Fragments.ChartsFragment;
 import com.danielkim.expensemanager.Fragments.HistoryFragment;
-import com.danielkim.expensemanager.Fragments.INavDrawerFragment;
+import com.danielkim.expensemanager.Fragments.IBottomNavFragment;
 import com.danielkim.expensemanager.Fragments.OverviewFragment;
 import com.danielkim.expensemanager.MySharedPreferences;
 import com.danielkim.expensemanager.R;
@@ -55,21 +55,13 @@ public class MainActivity extends AppCompatActivity
                 .commit();
         setActionBarTitle(getResources().getString(R.string.nav_overview));
         navigationView.performClick();
-
-        getSupportFragmentManager().addOnBackStackChangedListener(
-                new FragmentManager.OnBackStackChangedListener() {
-                    public void onBackStackChanged() {
-                        // Update Nav Drawer selection
-                        updateNavDrawerSelection();
-                    }
-                });
     }
 
-    private void updateNavDrawerSelection(){
+    private void updateNavSelection(){
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container);
-        if (fragment instanceof INavDrawerFragment){
+        if (fragment instanceof IBottomNavFragment){
             // set nav drawer selection to current active fragment
-            navigationView.performClick();
+            navigationView.setSelectedItemId(((IBottomNavFragment) fragment).getNavDrawerId());
         }
     }
 
@@ -81,7 +73,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        updateNavDrawerSelection();
+        updateNavSelection();
         String currency = MySharedPreferences.getCurrency(this);
         String budget = MySharedPreferences.getBudget(this);
 
@@ -157,9 +149,11 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.nav_history:
                 fragment = HistoryFragment.newInstance(Calendar.getInstance());
+                title = getString(R.string.nav_history);
                 break;
             case R.id.nav_charts:
                 fragment = ChartsFragment.newInstance(Calendar.getInstance());
+                title = getString(R.string.nav_charts);
                 break;
         }
 
@@ -167,7 +161,6 @@ public class MainActivity extends AppCompatActivity
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.container, fragment)
-                    .addToBackStack(null)
                     .commit();
         }
 

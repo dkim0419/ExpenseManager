@@ -25,7 +25,7 @@ import java.util.Calendar;
 /**
  * Created by Daniel on 4/21/2016.
  */
-public class HistoryFragment extends Fragment implements INavDrawerFragment, LoaderManager.LoaderCallbacks<Cursor> {
+public class HistoryFragment extends Fragment implements IBottomNavFragment, LoaderManager.LoaderCallbacks<Cursor> {
     private RecyclerView mRecyclerView;
     private HistoryAdapter adapter;
 

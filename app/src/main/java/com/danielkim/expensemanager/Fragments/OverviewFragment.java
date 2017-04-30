@@ -49,7 +49,7 @@ import java.util.Map;
 /**
  * Created by Daniel on 2/17/2016.
  */
-public class OverviewFragment extends Fragment implements INavDrawerFragment, LoaderManager.LoaderCallbacks<Cursor> {
+public class OverviewFragment extends Fragment implements IBottomNavFragment, LoaderManager.LoaderCallbacks<Cursor> {
     private TextView txtCurrentMonth = null;
     private FloatingActionButton fabAddExpense; // add new expense fab button
     private AutoResizeTextView txtCurrentMonthExpenses = null;

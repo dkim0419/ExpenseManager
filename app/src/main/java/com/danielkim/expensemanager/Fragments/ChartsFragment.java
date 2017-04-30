@@ -47,7 +47,7 @@ import java.util.Map;
  * Created by Daniel on 1/29/2017.
  */
 
-public class ChartsFragment extends Fragment implements INavDrawerFragment, LoaderManager.LoaderCallbacks<Cursor> {
+public class ChartsFragment extends Fragment implements IBottomNavFragment, LoaderManager.LoaderCallbacks<Cursor> {
     private DBHelper db;
     private static final int LOADER_ID = 0;
     private static final String ARGS_CUR_DISPLAYED_DATE = "mCurDisplayedDate";

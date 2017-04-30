@@ -5,6 +5,6 @@ package com.danielkim.expensemanager.Fragments;
  * Fragments that are part of the navigation drawer
  */
 
-public interface INavDrawerFragment {
+public interface IBottomNavFragment {
     int getNavDrawerId();
 }
