@@ -116,7 +116,7 @@ public class ChartsFragment extends Fragment implements IBottomNavFragment, Load
         mPieChart = (PieChart) v.findViewById(R.id.pie_chart);
         mPieChart.setNoDataText(getResources().getString(R.string.chart_no_data));
         mPieChart.setNoDataTextColor(Color.DKGRAY);
-        mPieChart.setRotationEnabled(false);
+        mPieChart.setRotationEnabled(true);
         mPieChart.setHoleRadius(65);
         mPieChart.setDescription(null);
         mPieChart.setEntryLabelColor(Color.WHITE);
@@ -258,6 +258,7 @@ public class ChartsFragment extends Fragment implements IBottomNavFragment, Load
             mPieChart.setData(data);
             setPieChartCenterText(totalAmount, getResources().getString(R.string.chart_total), -1);
 
+            mPieChart.setRotationAngle(-90);
             mPieChart.animateY(1000, Easing.EasingOption.EaseInOutQuad);
         } else {
             mPieChart.clear();

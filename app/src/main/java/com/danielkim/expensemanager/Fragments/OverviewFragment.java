@@ -121,7 +121,7 @@ public class OverviewFragment extends Fragment implements IBottomNavFragment, Lo
         mPieChart = (PieChart) v.findViewById(R.id.pie_chart);
         mPieChart.setNoDataText(getResources().getString(R.string.chart_no_data));
         mPieChart.setNoDataTextColor(Color.DKGRAY);
-        mPieChart.setRotationEnabled(false);
+        mPieChart.setRotationEnabled(true);
         mPieChart.getLegend().setEnabled(false);
         mPieChart.setHoleRadius(65);
         mPieChart.setDescription(null);
