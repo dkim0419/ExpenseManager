@@ -2,11 +2,14 @@ package com.danielkim.expensemanager.Adapters;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import com.danielkim.expensemanager.Activities.MainActivity;
 import com.danielkim.expensemanager.Fragments.HistoryFilterFragment;
@@ -34,6 +37,7 @@ public class HistoryFilterAdapter extends CursorRecyclerViewAdapter<HistoryFilte
         private TextView mDate;
         private TextView mCount;
         private CardView mCardView;
+        private ImageView mCircle;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -41,6 +45,7 @@ public class HistoryFilterAdapter extends CursorRecyclerViewAdapter<HistoryFilte
             mDate = (TextView)itemView.findViewById(R.id.txt_hist_filter_month);
             mCount = (TextView)itemView.findViewById(R.id.txt_hist_filter_count);
             mCardView = (CardView) itemView.findViewById(R.id.hist_filter_cardview);
+            mCircle = (ImageView) itemView.findViewById(R.id.circle);
         }
     }
 
@@ -63,6 +68,7 @@ public class HistoryFilterAdapter extends CursorRecyclerViewAdapter<HistoryFilte
                 MySharedPreferences.getCurrency(mContext), amount));
         holder.mDate.setText(monthYearFormatted);
         holder.mCount.setText(String.format(mContext.getResources().getString(R.string.total_transactions), count));
+        holder.mCircle.setColorFilter(ContextCompat.getColor(mContext, R.color.colorAccent));
 
         holder.mCardView.setOnClickListener(new View.OnClickListener() {
             @Override
